@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "78499670368",
+    "project_id": "takeit-9b0cb",
+    "storage_bucket": "takeit-9b0cb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:78499670368:android:830d305f8f4ee515649605",
+        "android_client_info": {
+          "package_name": "com.example.takeittt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5V9z7mqmB62NEIQan6hIFA9qDjtx6_SE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

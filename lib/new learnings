@@ -1,0 +1,27 @@
+
+
+1  rich text me recognizer laga skte h ..ontap krke,
+2  You can use AnimatedDefaultTextStyle to smoothly transition between different text styles (like size, color, or weight) without janky animations.
+3 .obs ka kaam variable ko reactive banana hai, taaki jab bhi uski value change ho, UI automatically update ho jaye bina setState() ya update()
+4  Get.find() ka kaam
+    Get.find<Controller>() pehle se registered controller ko find karne ke liye use hota hai.
+     Ye naya controller create nahi karta, balki jo Get.put() se already memory me hai, usi ko access karta hai. Jab hume kisi function ya widget me ek pehle se existing controller chahiye,
+     tab hum Get.find() ka use karte hain. 🚀
+5 Get.put() ka kaam
+  Get.put(Controller()) kisi bhi controller ko memory me register karne ke liye use hota hai, taaki hum usko kahin bhi access kar sakein. Jab app load hoti hai, tab controller create hota hai aur jab tak app band nahi hoti,
+   tab tak woh memory me rehta hai. Ye zyada tar tab use hota hai jab kisi controller ki lifecycle pura app ke liye manage karni ho.
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
