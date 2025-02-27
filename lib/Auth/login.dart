@@ -17,7 +17,9 @@ class Login extends StatefulWidget {
   @override
   State<Login> createState() => _LoginState();
 }
-final Logincontroler logincontroler = Get.find();
+final Logincontroler logincontroler = Get.put(
+  Logincontroler()
+);
 
 class _LoginState extends State<Login> {
 
@@ -27,17 +29,22 @@ class _LoginState extends State<Login> {
     if (formkey.currentState!.validate()) {
       try {
         print("Attempting login with email: ${email.text}");
+        print(email.text);
+        print(password.text);
         UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text,
           password: password.text,
         );
-        print("Login successful: ${userCredential.user?.uid}");
-        SuccessSnackbar();
+        print("user credential gathered");
+        Get.toNamed(
+          Routenames.gnav,
+          arguments: {
+            'Email': email.text,
+            'isAdmin': true,
+            'password': userPassword,
+          },
+        );
 
-        // Debug the navigation
-        print("Attempting to navigate to ${Routenames.gnav}");
-
-        print("Navigation called - if you don't see this, navigation is causing an error");
       } on FirebaseAuthException catch (error) {
         print("Firebase Auth Error: ${error.code}");
         if (error.code == 'user-not-found') {
@@ -91,14 +98,7 @@ class _LoginState extends State<Login> {
 
   Submit() {
     String userPassword = password.text;
-    Get.offAllNamed(
-      Routenames.gnav,
-      arguments: {
-        'Email': email.text,
-        'isAdmin': true,
-        'password': userPassword,
-      },
-    );
+
   }
 
 
@@ -250,8 +250,9 @@ class _LoginState extends State<Login> {
                   enableFeedback: true,
                   onTap: () {
                     if (formkey.currentState!.validate()) {
+                      userlogin();
                      logincontroler.setUser(email.text);
-                     Submit();
+
                     } else {
                     }
                   },

@@ -1,6 +1,10 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:takeittt/utils/user_controller.dart';
 
@@ -28,12 +32,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         : userController.email.value;
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+  Future<void> uploadImage(String userId) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
     if (pickedFile != null) {
-      userController.setProfileImage(File(pickedFile.path));
+      File file = File(pickedFile.path);
+      String fileName = 'images/${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+      UploadTask uploadTask =
+      FirebaseStorage.instance.ref(fileName).putFile(file);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'profileImage': downloadUrl,
+      });
     }
   }
+
+
 
   void _saveProfile() {
     userController.setUser(nameController.text, emailController.text);
@@ -54,7 +73,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: _pickImage,
+              onTap:(){
+                uploadImage('');
+              },
               child: Obx(() => CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.grey[300],

@@ -112,7 +112,7 @@ class _MyStackWidgetState extends State<MyStackWidget> {
                Row(
                   children: [
                     Hero(
-                      tag: "title",
+                      tag: "ter",
                       child: Material(
                         color: Colors.transparent,
                         child: SizedBox(

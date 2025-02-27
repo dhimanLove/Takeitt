@@ -12,7 +12,32 @@ class Laptop extends StatefulWidget {
 class _LaptopState extends State<Laptop> {
   bool isclicked = false;
   final storage = GetStorage();
+  void addProductToCart(Map<String, dynamic> product) {
 
+    List<Map<String, dynamic>> cartProducts = List<Map<String, dynamic>>.from(storage.read('cart_products') ?? []);
+
+    bool productExists = false;
+    for (var existingProduct in cartProducts) {
+      if (existingProduct['name'] == product['name']) {
+        productExists = true;
+        break;
+      }
+    }
+
+    if (productExists) {
+      // Show error message if the product is already in the cart
+      Get.snackbar('Cart', 'Product is already in the cart!', duration: Duration(milliseconds: 800));
+    } else {
+      // Add the new product to the cart
+      cartProducts.add(product);
+
+      // Store the updated cart products list back to GetStorage
+      storage.write('cart_products', cartProducts);
+
+      // Show success message
+      Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
+    }
+  }
   final List<Color> colorOptions = [
     Colors.black,
     Colors.blueGrey,
@@ -121,36 +146,26 @@ class _LaptopState extends State<Laptop> {
               Spacer(),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child:
+                ElevatedButton(
                   onPressed: () {
                     var product = {
-                      'name':'Macbook m3',
+                      'name': 'The MacBook M3 ',
                       'imageUrl': 'lib/Assets/mac.png',
-                      'price': '\999',
+                      'price': '₹ 78000/-',
+                      'quantity': 1,
                     };
-
-                    // Read the existing cart products from storage (if any)
-                    List cartProducts = storage.read('cart_products') ?? [];
-
-                    // Add the new product to the cart
-                    cartProducts.add(product);
-
-                    // Store the updated cart products list back to GetStorage
-                    storage.write('cart_products', cartProducts);
-
-                    // Show success message
-                    Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
+                    addProductToCart(product);
                   },
-
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 11),
+                    padding: const EdgeInsets.symmetric(vertical: 11),
                     backgroundColor: Colors.blue,
                     elevation: 5,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Add to Cart',
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),

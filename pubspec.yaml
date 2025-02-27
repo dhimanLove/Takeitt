@@ -106,6 +106,7 @@ dependencies:
 
   #sharing feature clipboard
   share_plus:
+  lucide_icons: ^0.257.0
 
 
 dev_dependencies:

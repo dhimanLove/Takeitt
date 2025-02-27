@@ -1,6 +1,8 @@
 
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,6 +20,7 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
+
   final Registercontroller userController = Get.find();
   final Logincontroler loginController = Get.find();
   @override
@@ -42,18 +45,24 @@ class _AccountState extends State<Account> {
           IconButton(onPressed: () {
             showSearch(context: context, delegate: MySearchDelegate());
           }, icon: Icon(Icons.search,color: Colors.white,)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.mic,color: Colors.white,)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.shopping_cart,color: Colors.white,)),
+          IconButton(onPressed: () {
+
+          }, icon: Icon(Icons.mic,color: Colors.white,)),
+          IconButton(onPressed: () {
+            Get.toNamed(Routenames.cart);
+          }, icon: Icon(Icons.shopping_cart,color: Colors.white,
+          ),
+          ),
         ],
       ),
       drawer: MyDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
+          Get.reload();
           await Future.delayed(Duration(seconds: 1));
          Get.snackbar('Success',
               'Page Reloaded',
            dismissDirection: DismissDirection.horizontal,
-
          );
         },
         child: SingleChildScrollView(
@@ -87,7 +96,9 @@ class _AccountState extends State<Account> {
                                 ? Icon(Icons.person, size: 50, color: Colors.white)
                                 : null,
                           ),
-                        )),),
+                        ),
+                        ),
+                      ),
 
                     Obx(() => Column(
                         children: [
@@ -100,12 +111,14 @@ class _AccountState extends State<Account> {
                             style: TextStyle(fontSize: 16),
                           ),
                         ],
-                      )),
+                      ),
+                    ),
                       Obx(() => Text(
                         loginController.email.value,
                         style: TextStyle(fontSize: 16),
                       ),
-                      ), //obx to give stateful properties to it
+                      ),
+                      //obx to give stateful properties to it
                       Divider(
                         thickness: 2,
                       ),

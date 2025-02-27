@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -40,7 +41,6 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: Getstarted(),
       getPages: Routes.pages,
-      initialRoute: Routenames.getstart,
+      initialRoute: FirebaseAuth.instance.currentUser != null ?Routenames.gnav : Routenames.getstart,
     );
   }
 }
