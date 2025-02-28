@@ -22,14 +22,30 @@ class _TvState extends State<Tv> {
     Colors.blue,
     Colors.green,
   ];
-  void addProductToCart(Map<String, dynamic> product) {
-    var cartProducts = storage.read<List<Map<String, dynamic>>>('cart_products') ?? [];
-    if (cartProducts.any((item) => item['name'] == product['name'])) {
-      Get.snackbar('Cart', 'Product already in cart!', backgroundColor: Colors.red, colorText: Colors.white);
+  void addProductToCart(product) {
+
+    List cartProducts = List.from(storage.read('cart_products') ?? []);
+
+    bool productExists = false;
+    for (var existingProduct in cartProducts) {
+      if (existingProduct['name'] == product['name']) {
+        productExists = true;
+        break;
+      }
+    }
+
+    if (productExists) {
+
+      Get.snackbar('Cart', 'Product is already in the cart!', duration: Duration(milliseconds: 800));
     } else {
+
       cartProducts.add(product);
+
+
       storage.write('cart_products', cartProducts);
-      Get.snackbar('Cart', 'Product added!', duration: Duration(milliseconds: 800));
+
+
+      Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
     }
   }
 
@@ -108,7 +124,7 @@ class _TvState extends State<Tv> {
                       var product = {
                         'name': 'Samsung LCD',
                         'imageUrl': 'https://www.figma.com/file/4fsrPVHqwtxNSPbVMPcchJ/image/462a73798c40c255812e19897c08f9831a88c4f0',
-                        'price': '\999',
+                        'price': '\$9989',
                       };
                       addProductToCart(product);
                     },

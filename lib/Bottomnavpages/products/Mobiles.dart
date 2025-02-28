@@ -12,6 +12,32 @@ class Mobile extends StatefulWidget {
 class _MobileState extends State<Mobile> {
   bool isclicked = false;
   final storage = GetStorage();
+  void addProductToCart(product) {
+
+    List cartProducts = List.from(storage.read('cart_products') ?? []);
+
+    bool productExists = false;
+    for (var existingProduct in cartProducts) {
+      if (existingProduct['name'] == product['name']) {
+        productExists = true;
+        break;
+      }
+    }
+
+    if (productExists) {
+
+      Get.snackbar('Cart', 'Product is already in the cart!', duration: Duration(milliseconds: 800));
+    } else {
+
+      cartProducts.add(product);
+
+
+      storage.write('cart_products', cartProducts);
+
+
+      Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
+    }
+  }
   final List<Color> colorOptions = [
     Colors.black,
     Colors.blueGrey,
@@ -29,15 +55,39 @@ class _MobileState extends State<Mobile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10),
+              SizedBox(height: 15),
               Center(
-                child: Text(
-                  'Smartphone',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Laptop',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(width: 30),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isclicked = !isclicked;
+                          Get.snackbar(
+                            'Success',
+                            isclicked ? 'Added to Cart' : 'Removed from Favourites',
+                            duration: Duration(milliseconds: 800),
+                          );
+                        });
+                      },
+                      icon: Icon(
+                        isclicked ? Icons.favorite : Icons.favorite_border,
+                        color: isclicked ? Colors.red : Colors.grey,
+                        size: 30,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(height: 15),
@@ -96,23 +146,7 @@ class _MobileState extends State<Mobile> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    var product = {
-                      'name': 'Iphone-13',
-                      'imageUrl': 'https://itronics.in/wp-content/uploads/2024/09/iPhone_16_Pro_Natural_Titanium_PDP_Image_Position_1__en-IN.png',
-                      'price': '\999',
-                    };
 
-                    // Read the existing cart products from storage (if any)
-                    List<Map<String, dynamic>> cartProducts = storage.read<List<Map<String, dynamic>>>('cart_products') ?? [];
-
-                    // Add the new product to the cart
-                    cartProducts.add(product);
-
-                    // Store the updated cart products list back to GetStorage
-                    storage.write('cart_products', cartProducts);
-
-                    // Show success message
-                    Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
                   },
 
                   style: ElevatedButton.styleFrom(

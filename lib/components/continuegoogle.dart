@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:takeittt/Auth/Authentication.dart';
+import 'package:takeittt/routes/routenames.dart';
 
 class Googlecont extends StatefulWidget {
   const Googlecont({super.key});
@@ -11,10 +16,82 @@ class Googlecont extends StatefulWidget {
 }
 
 class _GooglecontState extends State<Googlecont> {
+
+  Future<void> loginWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google Sign-In canceled by user')),
+        );
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        Map<String, dynamic> userData = {
+          'email': userCredential.user!.email,
+          'name': userCredential.user!.displayName,
+          'profilePic': userCredential.user!.photoURL,
+          'uid': userCredential.user!.uid,
+        };
+
+        try {
+          await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(
+            userData,
+            SetOptions(merge: true),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('User data saved successfully')),
+          );
+
+          Navigator.pushReplacementNamed(context, '/home');
+        } catch (e) {
+          print("Error saving user data to Firestore: $e");
+          if (e is FirebaseException) {
+            print("Firebase error code: ${e.code}");
+            print("Firebase error message: ${e.message}");
+          } else if (e is PlatformException) {
+            print("Platform exception: ${e.code}");
+            print("Platform exception message: ${e.message}");
+          } else {
+            print("Unexpected error: $e");
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to save user data to Firestore')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to retrieve user details')),
+        );
+      }
+
+      print("Signed in as: ${userCredential.user?.email}");
+    } catch (e) {
+      print("Error signing in with Google: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing in with Google')),
+      );
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: GoogleSignIn().signIn,
+      onTap: (){
+        loginWithGoogle(context);
+      },
       child: Container(
         margin: EdgeInsets.symmetric(
           horizontal: 35,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class Slkincare extends StatefulWidget {
   const Slkincare({super.key});
@@ -9,6 +10,34 @@ class Slkincare extends StatefulWidget {
 }
 
 class _SlkincareState extends State<Slkincare> {
+  bool isclicked = false;
+  final storage = GetStorage();
+  void addProductToCart(product) {
+
+    List cartProducts = List.from(storage.read('cart_products') ?? []);
+
+    bool productExists = false;
+    for (var existingProduct in cartProducts) {
+      if (existingProduct['name'] == product['name']) {
+        productExists = true;
+        break;
+      }
+    }
+
+    if (productExists) {
+
+      Get.snackbar('Cart', 'Product is already in the cart!', duration: Duration(milliseconds: 800));
+    } else {
+
+      cartProducts.add(product);
+
+
+      storage.write('cart_products', cartProducts);
+
+
+      Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
+    }
+  }
   final List<Color> colorOptions = [
     Colors.black,
     Colors.blueGrey,
@@ -28,13 +57,37 @@ class _SlkincareState extends State<Slkincare> {
             children: [
               SizedBox(height: 10),
               Center(
-                child: Text(
-                  'Slkincare',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                child:Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'SkinCare',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(width: 30),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isclicked = !isclicked;
+                          Get.snackbar(
+                            'Success',
+                            isclicked ? 'Added to Cart' : 'Removed from Favourites',
+                            duration: Duration(milliseconds: 800),
+                          );
+                        });
+                      },
+                      icon: Icon(
+                        isclicked ? Icons.favorite : Icons.favorite_border,
+                        color: isclicked ? Colors.red : Colors.grey,
+                        size: 30,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(height: 15),
@@ -93,7 +146,13 @@ class _SlkincareState extends State<Slkincare> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.back();
+                    var product = {
+                      'name': 'SkinCare',
+                      'imageUrl': 'lib/Assets/cosmetic.png',
+                      'price': '₹ 780/-',
+                      'quantity': 1,
+                    };
+                    addProductToCart(product);
                   },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 11),

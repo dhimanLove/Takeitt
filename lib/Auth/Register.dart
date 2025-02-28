@@ -4,6 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:random_string/random_string.dart';
+import 'package:takeittt/Services/Database.dart';
 import 'package:takeittt/components/Authinput.dart';
 import 'package:takeittt/components/continuegoogle.dart';
 import 'package:takeittt/components/snacbars.dart';
@@ -289,13 +291,21 @@ class _RegisterState extends State<Register> {
                     ),
 
                     InkWell(
-                      enableFeedback: true,
-                      onTap: () {
+                      onTap: () async {
+                        String Id = randomAlphaNumeric(10);
+                        Map<String, dynamic> userinfomap = {
+                          'Name': name.text,
+                          'email': email.text,
+                          'password': password.text
+                        };
+
+                        DatabaseMethods databaseMethods = DatabaseMethods();
+                        await databaseMethods.addUser(userinfomap, Id);
+
                         if (formkey.currentState!.validate() && valuee == true) {
                           userController.setUser(name.text, email.text);
-                         registration();
+                          registration();
                           submit();
-                        } else {
                         }
                       },
                       child: Hero(

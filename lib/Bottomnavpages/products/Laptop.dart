@@ -12,32 +12,67 @@ class Laptop extends StatefulWidget {
 class _LaptopState extends State<Laptop> {
   bool isclicked = false;
   final storage = GetStorage();
-  void addProductToCart(Map<String, dynamic> product) {
 
-    List<Map<String, dynamic>> cartProducts = List<Map<String, dynamic>>.from(storage.read('cart_products') ?? []);
+  @override
+  void initState() {
+    super.initState();
+    // Check if the product is already in favorites on initialization
+    isclicked = _isProductInFavorites({
+      'name': 'The MacBook M3 ',
+      'imageUrl': 'lib/Assets/mac.png',
+      'price': '₹ 78000/-',
+      'quantity': 1,
+    });
+  }
 
-    bool productExists = false;
-    for (var existingProduct in cartProducts) {
-      if (existingProduct['name'] == product['name']) {
-        productExists = true;
-        break;
-      }
-    }
+  // Check if a product is in the favorites list
+  bool _isProductInFavorites(Map<String, dynamic> product) {
+    List<dynamic> favoritesProducts = List.from(storage.read('Fav_products') ?? []);
+    return favoritesProducts.any((item) => item['name'] == product['name']);
+  }
+
+  // Add or remove product from favorites
+  void toggleFavourite(Map<String, dynamic> product) {
+    List<dynamic> favoritesProducts = List.from(storage.read('Fav_products') ?? []);
+
+    bool productExists = favoritesProducts.any((item) => item['name'] == product['name']);
 
     if (productExists) {
-      // Show error message if the product is already in the cart
-      Get.snackbar('Cart', 'Product is already in the cart!', duration: Duration(milliseconds: 800));
+      favoritesProducts.removeWhere((item) => item['name'] == product['name']);
+      storage.write('Fav_products', favoritesProducts);
+      Get.snackbar('Favourites', 'Removed from Favourites!',
+          backgroundColor: Colors.red[200], duration: const Duration(milliseconds: 800));
+      setState(() {
+        isclicked = false;
+      });
     } else {
-      // Add the new product to the cart
-      cartProducts.add(product);
-
-      // Store the updated cart products list back to GetStorage
-      storage.write('cart_products', cartProducts);
-
-      // Show success message
-      Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
+      favoritesProducts.add(product);
+      storage.write('Fav_products', favoritesProducts);
+      Get.snackbar('Favourites', 'Added to Favourites!',
+          backgroundColor: Colors.green[200], duration: const Duration(milliseconds: 800));
+      setState(() {
+        isclicked = true;
+      });
     }
   }
+
+
+  void addProductToCart(product) {
+    List cartProducts = List.from(storage.read('cart_products') ?? []);
+
+    bool productExists = cartProducts.any((item) => item['name'] == product['name']);
+
+    if (productExists) {
+      Get.snackbar('Cart', 'Product is already in the cart!',
+          backgroundColor: Colors.pink[200], duration: const Duration(milliseconds: 800));
+    } else {
+      cartProducts.add(product);
+      storage.write('cart_products', cartProducts);
+      Get.snackbar('Cart', 'Product added successfully!',
+          duration: const Duration(milliseconds: 800));
+    }
+  }
+
   final List<Color> colorOptions = [
     Colors.black,
     Colors.blueGrey,
@@ -48,6 +83,13 @@ class _LaptopState extends State<Laptop> {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> product = {
+      'name': 'The MacBook M3 ',
+      'imageUrl': 'lib/Assets/mac.png',
+      'price': '₹ 78000/-',
+      'quantity': 1,
+    };
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -55,13 +97,13 @@ class _LaptopState extends State<Laptop> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Laptop',
                       style: TextStyle(
                         fontSize: 32,
@@ -69,17 +111,10 @@ class _LaptopState extends State<Laptop> {
                         color: Colors.black87,
                       ),
                     ),
-                    SizedBox(width: 30),
+                    const SizedBox(width: 30),
                     IconButton(
                       onPressed: () {
-                        setState(() {
-                          isclicked = !isclicked;
-                          Get.snackbar(
-                            'Success',
-                            isclicked ? 'Added to Cart' : 'Removed from Favourites',
-                            duration: Duration(milliseconds: 800),
-                          );
-                        });
+                        toggleFavourite(product);
                       },
                       icon: Icon(
                         isclicked ? Icons.favorite : Icons.favorite_border,
@@ -90,7 +125,7 @@ class _LaptopState extends State<Laptop> {
                   ],
                 ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Hero(
@@ -103,7 +138,7 @@ class _LaptopState extends State<Laptop> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -124,7 +159,9 @@ class _LaptopState extends State<Laptop> {
                           child: CircleAvatar(
                             backgroundColor: color,
                             radius: 18,
-                            child: color == Colors.black ? Icon(Icons.check, color: Colors.white) : null,
+                            child: color == Colors.black
+                                ? const Icon(Icons.check, color: Colors.white)
+                                : null,
                           ),
                         ),
                       );
@@ -132,7 +169,7 @@ class _LaptopState extends State<Laptop> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Text(
                 'Discover the latest Laptop with a high-resolution OLED display, powerful processor, and long-lasting battery life. Experience next-gen performance with seamless multitasking.',
                 style: TextStyle(
@@ -142,19 +179,12 @@ class _LaptopState extends State<Laptop> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 10),
-              Spacer(),
+              const SizedBox(height: 10),
+              const Spacer(),
               SizedBox(
                 width: double.infinity,
-                child:
-                ElevatedButton(
+                child: ElevatedButton(
                   onPressed: () {
-                    var product = {
-                      'name': 'The MacBook M3 ',
-                      'imageUrl': 'lib/Assets/mac.png',
-                      'price': '₹ 78000/-',
-                      'quantity': 1,
-                    };
                     addProductToCart(product);
                   },
                   style: ElevatedButton.styleFrom(
@@ -171,7 +201,7 @@ class _LaptopState extends State<Laptop> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),

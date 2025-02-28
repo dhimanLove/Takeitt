@@ -12,7 +12,12 @@
           "package_name": "com.example.takeittt"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "78499670368-6v8hmcimssn5l95gh0g6qp4u5e95ov5p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD5V9z7mqmB62NEIQan6hIFA9qDjtx6_SE"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "78499670368-6v8hmcimssn5l95gh0g6qp4u5e95ov5p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

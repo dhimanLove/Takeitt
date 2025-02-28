@@ -4,13 +4,42 @@ class MySearchDelegate extends SearchDelegate {
   final List<String> searchResults = ["Shoes", "Laptops", "Electronics", "Food"];
 
   @override
+  ThemeData appBarTheme(BuildContext context) {
+    // Simple light theme for the AppBar
+    return ThemeData(
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        titleTextStyle: TextStyle(
+          color: Colors.black87,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(color: Colors.grey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+      ),
+    );
+  }
+
+  @override
   List<Widget>? buildActions(BuildContext context) {
-    // Actions are buttons that appear on the right side of the search bar.
     return [
       IconButton(
-        icon: Icon(Icons.clear),
+        icon: Icon(Icons.clear, color: Colors.grey),
+        tooltip: "Clear",
         onPressed: () {
-          query = ""; // Clears the search input when pressed.
+          query = "";
         },
       ),
     ];
@@ -18,43 +47,61 @@ class MySearchDelegate extends SearchDelegate {
 
   @override
   Widget? buildLeading(BuildContext context) {
-    // The leading widget is the left-side button (typically a back button).
     return IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () => close(context, null), // Closes the search when pressed.
+      icon: Icon(Icons.arrow_back, color: Colors.grey),
+      tooltip: "Back",
+      onPressed: () => close(context, null),
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    // This is shown when the user submits the search query.
-    return Center(
-      child: Text(
-        "You searched for: \"$query\"",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Container(
+      color: Colors.white,
+      child: Center(
+        child: Text(
+          "You searched: \"$query\"",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
       ),
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // Show suggestions based on the user’s input.
     List<String> filteredResults = searchResults
         .where((item) => item.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
-    return ListView.builder(
-      itemCount: filteredResults.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(filteredResults[index]),
-          onTap: () {
-            query = filteredResults[index]; // Set selected item as the query.
-            showResults(context); // Show the final search results.
-          },
-        );
-      },
+    return Container(
+      color: Colors.white,
+      child: filteredResults.isEmpty
+          ? Center(
+        child: Text(
+          "No matches found",
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      )
+          : ListView.builder(
+        itemCount: filteredResults.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(
+              filteredResults[index],
+              style: TextStyle(color: Colors.black87),
+            ),
+            tileColor: Colors.grey.shade50,
+            onTap: () {
+              query = filteredResults[index];
+              showResults(context);
+            },
+          );
+        },
+      ),
     );
   }
 }
-

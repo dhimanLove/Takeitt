@@ -1,20 +1,22 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class Registercontroller extends GetxController {
-  var username = ''.obs;//observable
+  var username = ''.obs;
   var email = ''.obs;
-  var profileImage = Rx<File?>(null);
+  var profileImageUrl = ''.obs; // Changed from Rx<File?> to RxString for Supabase URL
 
-  void setUser(String name, String emaill) {
+  void setUser(String name, String emaill, [String? imageUrl]) {
     username.value = name;
     email.value = emaill;
+    if (imageUrl != null) {
+      profileImageUrl.value = imageUrl;
+    }
   }
 
+
   void setProfileImage(File image) {
-    profileImage.value = image;
   }
 }
 
@@ -37,7 +39,7 @@ class CategoryController extends GetxController {
 class FilterController extends GetxController {
   var selectedFilter = 'Shoes'.obs;
   List<String> filters = [
-     'Shoes', 'Laptops', 'Electronics', 'Food', 'Kitchen', 'Furniture', 'Mobile', 'Kids'
+    'Shoes', 'Laptops', 'Electronics', 'Food', 'Kitchen', 'Furniture', 'Mobile', 'Kids'
   ];
 
   void selectFilter(String filter) {
@@ -46,30 +48,25 @@ class FilterController extends GetxController {
 }
 
 class CartController extends GetxController {
-  // Observable list of cart items, each item is a map containing 'name', 'price', and 'imageUrl'
   var cartItems = <Map<String, dynamic>>[].obs;
   var totalPrice = 0.0.obs;
   var isCartEmpty = true.obs;
 
-  // Load data from storage when the controller is initialized
   @override
   void onInit() {
     super.onInit();
-    // Load cart items from GetStorage
     loadCartFromStorage();
   }
 
-  // Load cart items from GetStorage
   void loadCartFromStorage() {
-    List<Map<String, dynamic>>? storedCart = GetStorage().read<List<Map<String, dynamic>>>("cart_products");
+    List<dynamic>? storedCart = GetStorage().read<List<dynamic>>("cart_products");
     if (storedCart != null) {
-      cartItems.assignAll(storedCart);
+      cartItems.assignAll(storedCart.map((e) => Map<String, dynamic>.from(e)));
       calculateTotalPrice();
       isCartEmpty.value = cartItems.isEmpty;
     }
   }
 
-  // Add an item to the cart and store it in GetStorage
   void addToCart(Map<String, dynamic> product) {
     cartItems.add(product);
     GetStorage().write("cart_products", cartItems);
@@ -77,7 +74,6 @@ class CartController extends GetxController {
     isCartEmpty.value = cartItems.isEmpty;
   }
 
-  // Remove an item from the cart and update GetStorage
   void removeFromCart(int index) {
     cartItems.removeAt(index);
     GetStorage().write("cart_products", cartItems);
@@ -85,8 +81,15 @@ class CartController extends GetxController {
     isCartEmpty.value = cartItems.isEmpty;
   }
 
-  // Calculate the total price of all cart items
   void calculateTotalPrice() {
-    totalPrice.value = cartItems.fold(0.0, (sum, item) => sum + (item['price'] ?? 0.0));
+    totalPrice.value = cartItems.fold(
+      0.0,
+          (sum, item) {
+        // Handle price as a string with currency symbol if needed
+        String priceStr = item['price']?.toString().replaceAll(RegExp(r'[^\d]'), '') ?? '0';
+        double price = double.tryParse(priceStr) ?? 0.0;
+        return sum + price;
+      },
+    );
   }
 }

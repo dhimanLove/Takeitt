@@ -1,23 +1,143 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-class Googlesignin{
-  final FirebaseAuth auth = FirebaseAuth.instance;
+class GoogleSignInProvider {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  /// Sign in with Google
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      print("Attempting Google sign-in...");
+      await _googleSignIn.signOut(); // Ensure fresh sign-in
 
-  getcurrentuser()async{
-    return await auth.currentUser;
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        print("Google sign-in canceled by user.");
+        return null;
+      }
 
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      print("Google sign-in successful: ${userCredential.user?.email}");
+
+      // Add or update user in Firestore
+      await _saveUserToFirestore(userCredential.user);
+
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      print("FirebaseAuthException: ${e.message}");
+      return null;
+    } catch (e, stackTrace) {
+      print("Error during Google sign-in: $e");
+      print("StackTrace: $stackTrace");
+      return null;
+    }
   }
-  signInWithGoogle(
-      BuildContext context
-      )
-  async
-  {
-      final FirebaseAuth firebaseAuth  = FirebaseAuth.instance ;
-      final GoogleSignIn googleSignIn =GoogleSignIn();
-      final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
-      final GoogleSignInAuthentication? googleSignInAuthentication = await googleSignInAccount?.authentication;
+
+  /// Save user details to Firestore
+  Future<void> _saveUserToFirestore(User? user) async {
+    if (user == null) return;
+
+    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      await userRef.set({
+        'uid': user.uid,
+        'name': user.displayName ?? "No Name",
+        'email': user.email ?? "No Email",
+        'profilePic': user.photoURL ?? "",
+        'createdAt': FieldValue.serverTimestamp(),
+      }).then((_) {
+        print(" User added to Firestore: ${user.email}");
+      }).catchError((error) {
+        print(" Firestore write error: $error");
+      });
+    } else {
+      print("⚠ User already exists in Firestore.");
+    }
+  }
+
+
+  /// Sign out function
+  Future<void> signOut() async {
+    try {
+      print("Signing out from Firebase...");
+      await _auth.signOut();
+      print("Firebase sign-out successful!");
+
+      print("Disconnecting Google account...");
+      await _googleSignIn.disconnect();
+      await _googleSignIn.signOut();
+      print("Google sign-out successful!");
+    } catch (e, stackTrace) {
+      print("Error signing out: $e");
+      print("StackTrace: $stackTrace");
+    }
+  }
+}
+
+/// Google Sign-In Function
+Future<void> signInWithGoogle(BuildContext context) async {
+  try {
+    final GoogleSignInProvider googleSignInProvider = GoogleSignInProvider();
+    final UserCredential? userCredential = await googleSignInProvider.signInWithGoogle();
+    if (userCredential == null) return;
+
+    User? user = userCredential.user;
+    if (user != null) {
+      print("Checking if user exists in Firestore...");
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+
+      if (userDoc.exists) {
+        print("Existing user detected. Navigating to Home...");
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        print("New user detected. Navigating to Signup...");
+        Navigator.pushReplacementNamed(context, '/signup');
+      }
+    }
+  } catch (error) {
+    print("Google Sign-In Error: $error");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Failed to sign in with Google. Please try again.")),
+    );
+  }
+}
+
+/// Google Sign-Up Function
+Future<void> signUpWithGoogle(BuildContext context) async {
+  try {
+    final GoogleSignInProvider googleSignInProvider = GoogleSignInProvider();
+    final UserCredential? userCredential = await googleSignInProvider.signInWithGoogle();
+    if (userCredential == null) return;
+
+    User? user = userCredential.user;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'uid': user.uid,
+        'name': user.displayName,
+        'email': user.email,
+        'profilePic': user.photoURL,
+        'createdAt': Timestamp.now(),
+      });
+
+      print("New user registered successfully! Navigating to Home...");
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  } catch (error) {
+    print("Google Sign-Up Error: $error");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Failed to sign up with Google. Please try again.")),
+    );
   }
 }
