@@ -3,7 +3,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:takeittt/Bottomnavpages/Account.dart';
+import 'package:takeittt/Bottomnavpages/Account/QuestandAns.dart';
+import 'package:takeittt/Bottomnavpages/Account/Refer_and_earn.dart';
+import 'package:takeittt/Bottomnavpages/Account/Wishlist.dart';
 import 'package:takeittt/Bottomnavpages/Account/editprofile.dart';
+import 'package:takeittt/Bottomnavpages/Account/review.dart';
+import 'package:takeittt/pages/Wallet.dart';
 import 'package:takeittt/utils/user_controller.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -68,7 +73,7 @@ class MyDrawer extends StatelessWidget {
                   userController.username.value,
                   style: TextStyle(
                       fontSize: Get.width *
-                          0.045), // Scaled font (4.5% of screen width)
+                          0.045),
                 ),
               ),
               subtitle: Obx(
@@ -78,22 +83,22 @@ class MyDrawer extends StatelessWidget {
                       : loginController.email.value,
                   style: TextStyle(
                       fontSize: Get.width *
-                          0.035), // Scaled font (3.5% of screen width)
+                          0.035),
                 ),
               ),
             ),
-            Divider(thickness: Get.width * 0.005), // Scaled thickness
+            Divider(thickness: Get.width * 0.005),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(
                   top: Get.width *
-                      0.05, // Scaled top padding (5% of screen width)
+                      0.05,
                   left: Get.width *
-                      0.03, // Scaled left padding (3% of screen width)
+                      0.03,
                 ),
                 child: Column(
                   crossAxisAlignment:
-                      CrossAxisAlignment.start, // Align items to the left
+                      CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -102,19 +107,20 @@ class MyDrawer extends StatelessWidget {
                       child: Text(
                         'Edit Profile',
                         style: TextStyle(
-                          fontSize: Get.width *
-                              0.04, // Scaled font (4% of screen width)
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
-                    SizedBox(height: Get.width * 0.05), // Scaled spacing
+                    SizedBox(height: Get.width * 0.05),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(ReferAndEarnPage());
+                      },
                       child: Text(
                         'Refer And Earn',
                         style: TextStyle(
-                          fontSize: Get.width * 0.04,
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -125,7 +131,7 @@ class MyDrawer extends StatelessWidget {
                       child: Text(
                         'Coupons',
                         style: TextStyle(
-                          fontSize: Get.width * 0.04,
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -136,51 +142,59 @@ class MyDrawer extends StatelessWidget {
                       child: Text(
                         'My Orders',
                         style: TextStyle(
-                          fontSize: Get.width * 0.04,
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
                     SizedBox(height: Get.width * 0.05),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(WishlistScreen());
+                      },
                       child: Text(
                         'Wishlist',
                         style: TextStyle(
-                          fontSize: Get.width * 0.04,
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
                     SizedBox(height: Get.width * 0.05),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(WalletScreen());
+                      },
                       child: Text(
                         'Wallet',
                         style: TextStyle(
-                          fontSize: Get.width * 0.04,
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
                     SizedBox(height: Get.width * 0.05),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get..to(ReviewScreen());
+                      },
                       child: Text(
                         'Reviews',
                         style: TextStyle(
-                          fontSize: Get.width * 0.04,
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
                     SizedBox(height: Get.width * 0.05),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(FAQScreen());
+                      },
                       child: Text(
                         'Question & Answer',
                         style: TextStyle(
-                          fontSize: Get.width * 0.04,
+                          fontSize: Get.width * 0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -188,15 +202,15 @@ class MyDrawer extends StatelessWidget {
                     Spacer(),
                     Padding(
                       padding: EdgeInsets.only(
-                        bottom: Get.width * 0.05, // Scaled bottom padding
-                        right: Get.width * 0.03, // Scaled right padding
+                        bottom: Get.width * 0.05,
+                        right: Get.width * 0.03,
                       ),
                       child: GestureDetector(
                         onTap: () {
                           Get.offAllNamed('/login');
                         },
                         child: Container(
-                          height: Get.width * 0.08, // Scaled height
+                          height: Get.width * 0.08,
                           width: Get.width *
                               0.4, // Scaled width (40% of screen width)
                           decoration: BoxDecoration(

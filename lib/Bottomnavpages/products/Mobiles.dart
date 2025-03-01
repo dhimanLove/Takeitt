@@ -10,34 +10,66 @@ class Mobile extends StatefulWidget {
 }
 
 class _MobileState extends State<Mobile> {
-  bool isclicked = false;
+  bool isFavorited = false; // Track favorite state in the state class
   final storage = GetStorage();
-  void addProductToCart(product) {
+  late List favoritesProducts; // List for favorites
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize favorites list from storage
+    favoritesProducts = List.from(storage.read('Fav_products') ?? []);
+    // Check if the product is already in favorites
+    isFavorited = _isProductInFavorites({
+      'name': 'iPhone 16 Pro',
+      'imageUrl': 'https://itronics.in/wp-content/uploads/2024/09/iPhone_16_Pro_Natural_Titanium_PDP_Image_Position_1__en-IN.png',
+      'price': '999',
+      'quantity': 1,
+    });
+  }
+
+  bool _isProductInFavorites(Map<String, dynamic> product) {
+    return favoritesProducts.any((item) => item['name'] == product['name']);
+  }
+
+  void toggleFavorite(Map<String, dynamic> product) {
+    setState(() {
+      isFavorited = !isFavorited;
+
+      List favoritesProducts = List.from(storage.read('Fav_products') ?? []);
+
+      bool productExists = favoritesProducts.any((item) => item['name'] == product['name']);
+
+      if (productExists) {
+        favoritesProducts.removeWhere((item) => item['name'] == product['name']);
+        storage.write('Fav_products', favoritesProducts);
+        Get.snackbar('Favorites', 'Removed from Favorites!',
+            backgroundColor: Colors.red[200], duration: const Duration(milliseconds: 800));
+      } else {
+        favoritesProducts.add(product);
+        storage.write('Fav_products', favoritesProducts);
+        Get.snackbar('Favorites', 'Added to Favorites!',
+            backgroundColor: Colors.green[200], duration: const Duration(milliseconds: 800));
+      }
+    });
+  }
+
+  void addProductToCart(Map<String, dynamic> product) {
     List cartProducts = List.from(storage.read('cart_products') ?? []);
 
-    bool productExists = false;
-    for (var existingProduct in cartProducts) {
-      if (existingProduct['name'] == product['name']) {
-        productExists = true;
-        break;
-      }
-    }
+    bool productExists = cartProducts.any((item) => item['name'] == product['name']);
 
     if (productExists) {
-
-      Get.snackbar('Cart', 'Product is already in the cart!', duration: Duration(milliseconds: 800));
+      Get.snackbar('Cart', 'Product is already in the cart!',
+          backgroundColor: Colors.pink[200], duration: const Duration(milliseconds: 800));
     } else {
-
       cartProducts.add(product);
-
-
       storage.write('cart_products', cartProducts);
-
-
-      Get.snackbar('Cart', 'Product added successfully!', duration: Duration(milliseconds: 800));
+      Get.snackbar('Cart', 'Product added successfully!',
+          duration: const Duration(milliseconds: 800));
     }
   }
+
   final List<Color> colorOptions = [
     Colors.black,
     Colors.blueGrey,
@@ -48,6 +80,13 @@ class _MobileState extends State<Mobile> {
 
   @override
   Widget build(BuildContext context) {
+    final product = {
+      'name': 'iPhone 16 Pro',
+      'imageUrl': 'https://itronics.in/wp-content/uploads/2024/09/iPhone_16_Pro_Natural_Titanium_PDP_Image_Position_1__en-IN.png',
+      'price': '999',
+      'quantity': 1,
+    };
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -55,42 +94,35 @@ class _MobileState extends State<Mobile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'Laptop',
+                      'Iphone- 13',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
                     ),
-                    SizedBox(width: 30),
+                    const SizedBox(width: 30),
                     IconButton(
                       onPressed: () {
-                        setState(() {
-                          isclicked = !isclicked;
-                          Get.snackbar(
-                            'Success',
-                            isclicked ? 'Added to Cart' : 'Removed from Favourites',
-                            duration: Duration(milliseconds: 800),
-                          );
-                        });
+                        toggleFavorite(product); // Toggle favorite state
                       },
                       icon: Icon(
-                        isclicked ? Icons.favorite : Icons.favorite_border,
-                        color: isclicked ? Colors.red : Colors.grey,
+                        isFavorited ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorited ? Colors.red : Colors.grey,
                         size: 30,
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Hero(
@@ -103,12 +135,12 @@ class _MobileState extends State<Mobile> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '\$999',
+                    '\$${product['price']}',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -132,7 +164,7 @@ class _MobileState extends State<Mobile> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Text(
                 'Discover the latest smartphone with a high-resolution OLED display, powerful processor, and long-lasting battery life. Experience next-gen performance with seamless multitasking.',
                 style: TextStyle(
@@ -141,16 +173,15 @@ class _MobileState extends State<Mobile> {
                   height: 1.5,
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-
+                    addProductToCart(product);
                   },
-
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 11),
+                    padding: const EdgeInsets.symmetric(vertical: 11),
                     backgroundColor: Colors.blue,
                     elevation: 5,
                     shape: RoundedRectangleBorder(
@@ -163,7 +194,7 @@ class _MobileState extends State<Mobile> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),

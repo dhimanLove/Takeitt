@@ -19,7 +19,6 @@ class _CartState extends State<Cart> {
   @override
   void initState() {
     super.initState();
-
     cartProducts = List.from(storage.read('cart_products') ?? []);
     favoritesProducts = List.from(storage.read('Fav_products') ?? []);
   }
@@ -37,7 +36,6 @@ class _CartState extends State<Cart> {
     });
   }
 
-
   int calculateTotalPrice(List products) {
     return products.fold(0, (sum, item) {
       String priceStr = item['price']?.toString().replaceAll(RegExp(r'[^\d]'), '') ?? '0';
@@ -53,18 +51,14 @@ class _CartState extends State<Cart> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
-        leading: IconButton(onPressed: (){}, icon: Icon(Icons.menu,color: Colors.white,)),
-        title: Text("Appbar",style: TextStyle(
-          color: Colors.white,
-          fontSize: 20
-        ),),
+        leading: IconButton(onPressed: (){}, icon: Icon(Icons.menu, color: Colors.white)),
+        title: Text("Appbar", style: TextStyle(color: Colors.white, fontSize: 20)),
         actions: [
           IconButton(
-            onPressed: () =>
-                showSearch(context: context, delegate: MySearchDelegate()),
+            onPressed: () => showSearch(context: context, delegate: MySearchDelegate()),
             icon: const Icon(Icons.search, color: Colors.white),
           ),
-          IconButton(onPressed: (){}, icon: Icon(Icons.mic,color: Colors.white,)),
+          IconButton(onPressed: (){}, icon: Icon(Icons.mic, color: Colors.white)),
         ],
       ),
       body: SafeArea(
@@ -74,9 +68,10 @@ class _CartState extends State<Cart> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Favorites (Wishlist) Section
                   Container(
                     width: Get.width,
-                    height: Get.height * 0.5,
+                    // Removed fixed height to allow dynamic content
                     color: Colors.white,
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -92,106 +87,117 @@ class _CartState extends State<Cart> {
                         ),
                         const SizedBox(height: 10),
                         favoritesProducts.isNotEmpty
-                            ? ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: favoritesProducts.length,
-                          itemBuilder: (context, index) {
-                            var product = favoritesProducts[index];
-                            return Card(
-                              elevation: 2,
-                              margin: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Stack(
-                                  children: [
-
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-
-                                        ClipRRect(
-                                          borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
-                                          child: product['imageUrl']?.startsWith('http') ?? false
-                                              ? Image.network(
-                                            product['imageUrl']!,
-                                            fit: BoxFit.cover,
-                                            height: 120,
-                                            width: 80,
-                                            loadingBuilder: (context, child, loadingProgress) {
-                                              if (loadingProgress == null) return child;
-                                              return const Center(child: CircularProgressIndicator());
-                                            },
-                                          )
-                                              : Image.asset(
-                                            product['imageUrl'] ?? 'assets/images/placeholder.png',
-                                            fit: BoxFit.cover,
-                                            height: 120,
-                                            width: 80,
-                                          ),
-                                        ),
-
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  product['name'] ?? 'Product',
-                                                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  '\$${product['price'] ?? '0'}',
-                                                  style: GoogleFonts.poppins(fontSize: 16, color: Colors.green),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                ElevatedButton(
-                                                  onPressed: () {
-
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors.yellow.shade700,
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                    ),
-                                                  ),
-                                                  child: Text(
-                                                    'Shop Now',
-                                                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.black),
-                                                  ),
-                                                ),
-                                              ],
+                            ? SizedBox(
+                          // Use SizedBox with a constrained height to prevent overflow
+                          height: Get.height * 0.45, // Adjusted height to fit within the screen
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: favoritesProducts.length,
+                            itemBuilder: (context, index) {
+                              var product = favoritesProducts[index];
+                              return Card(
+                                elevation: 2,
+                                margin: const EdgeInsets.symmetric(vertical: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Stack(
+                                    children: [
+                                      // Main content (image, text, and button)
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Product Image
+                                          ClipRRect(
+                                            borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                                            child: product['imageUrl']?.startsWith('http') ?? false
+                                                ? Image.network(
+                                              product['imageUrl']!,
+                                              fit: BoxFit.cover,
+                                              height: 120,
+                                              width: 80,
+                                              loadingBuilder: (context, child, loadingProgress) {
+                                                if (loadingProgress == null) return child;
+                                                return const Center(child: CircularProgressIndicator());
+                                              },
+                                            )
+                                                : Image.asset(
+                                              product['imageUrl'] ?? 'assets/images/placeholder.png',
+                                              fit: BoxFit.cover,
+                                              height: 120,
+                                              width: 80,
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-
-                                    Positioned(
-                                      top: 8,
-                                      right: 8,
-                                      child: IconButton(
-                                        onPressed: () {
-                                          removeFromWishlist(index);
-                                        },
-                                        icon: const Icon(Icons.favorite, color: Colors.red),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
+                                          // Product Details and Button
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    product['name'] ?? 'Product',
+                                                    style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    '\$${product['price'] ?? '0'}',
+                                                    style: GoogleFonts.poppins(fontSize: 16, color: Colors.green),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      // Optional: Add to cart when "Shop Now" is pressed
+                                                      final cartProduct = {
+                                                        'name': product['name'],
+                                                        'price': product['price'],
+                                                        'imageUrl': product['imageUrl'],
+                                                        'quantity': 1, // Default quantity
+                                                      };
+                                                      addProductToCart(cartProduct);
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.yellow.shade700,
+                                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(5),
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      'Shop Now',
+                                                      style: GoogleFonts.poppins(fontSize: 12, color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
+                                      // Favorite Icon (for removal from wishlist)
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: IconButton(
+                                          onPressed: () {
+                                            removeFromWishlist(index);
+                                          },
+                                          icon: const Icon(Icons.favorite, color: Colors.red),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         )
                             : Center(
                           child: Text(
@@ -203,7 +209,7 @@ class _CartState extends State<Cart> {
                     ),
                   ),
 
-
+                  // Cart Section (unchanged)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -221,7 +227,7 @@ class _CartState extends State<Cart> {
                         cartProducts.isNotEmpty
                             ? ListView.builder(
                           shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           itemCount: cartProducts.length,
                           itemBuilder: (context, index) {
                             var product = cartProducts[index];
@@ -426,5 +432,21 @@ class _CartState extends State<Cart> {
         ),
       ),
     );
+  }
+
+  void addProductToCart(Map<String, dynamic> product) {
+    List cartProducts = List.from(storage.read('cart_products') ?? []);
+
+    bool productExists = cartProducts.any((item) => item['name'] == product['name']);
+
+    if (productExists) {
+      Get.snackbar('Cart', 'Product is already in the cart!',
+          backgroundColor: Colors.pink[200], duration: const Duration(milliseconds: 800));
+    } else {
+      cartProducts.add(product);
+      storage.write('cart_products', cartProducts);
+      Get.snackbar('Cart', 'Product added successfully!',
+          duration: const Duration(milliseconds: 800));
+    }
   }
 }
