@@ -16,32 +16,33 @@ class _LaptopState extends State<Laptop> {
   @override
   void initState() {
     super.initState();
-    // Check if the product is already in favorites on initialization
     isclicked = _isProductInFavorites({
       'name': 'The MacBook M3 ',
-      'imageUrl': 'lib/Assets/mac.png',
-      'price': '₹ 78000/-',
+      'imageUrl': '',
+      'price': '₹78000/-',
       'quantity': 1,
     });
   }
 
-  // Check if a product is in the favorites list
-  bool _isProductInFavorites(Map<String, dynamic> product) {
-    List<dynamic> favoritesProducts = List.from(storage.read('Fav_products') ?? []);
+  bool _isProductInFavorites( product) {
+    List favoritesProducts =
+        List.from(storage.read('Fav_products') ?? []);
     return favoritesProducts.any((item) => item['name'] == product['name']);
   }
 
-  // Add or remove product from favorites
-  void toggleFavourite(Map<String, dynamic> product) {
-    List<dynamic> favoritesProducts = List.from(storage.read('Fav_products') ?? []);
+  void toggleFavourite( product) {
+    List favoritesProducts =
+        List.from(storage.read('Fav_products') ?? []);
 
-    bool productExists = favoritesProducts.any((item) => item['name'] == product['name']);
+    bool productExists =
+        favoritesProducts.any((item) => item['name'] == product['name']);
 
     if (productExists) {
       favoritesProducts.removeWhere((item) => item['name'] == product['name']);
       storage.write('Fav_products', favoritesProducts);
       Get.snackbar('Favourites', 'Removed from Favourites!',
-          backgroundColor: Colors.red[200], duration: const Duration(milliseconds: 800));
+          backgroundColor: Colors.red[200],
+          duration: const Duration(milliseconds: 800));
       setState(() {
         isclicked = false;
       });
@@ -49,22 +50,24 @@ class _LaptopState extends State<Laptop> {
       favoritesProducts.add(product);
       storage.write('Fav_products', favoritesProducts);
       Get.snackbar('Favourites', 'Added to Favourites!',
-          backgroundColor: Colors.green[200], duration: const Duration(milliseconds: 800));
+          backgroundColor: Colors.green[200],
+          duration: const Duration(milliseconds: 800));
       setState(() {
         isclicked = true;
       });
     }
   }
 
-
   void addProductToCart(product) {
     List cartProducts = List.from(storage.read('cart_products') ?? []);
 
-    bool productExists = cartProducts.any((item) => item['name'] == product['name']);
+    bool productExists =
+        cartProducts.any((item) => item['name'] == product['name']);
 
     if (productExists) {
       Get.snackbar('Cart', 'Product is already in the cart!',
-          backgroundColor: Colors.pink[200], duration: const Duration(milliseconds: 800));
+          backgroundColor: Colors.pink[200],
+          duration: const Duration(milliseconds: 800));
     } else {
       cartProducts.add(product);
       storage.write('cart_products', cartProducts);
@@ -83,7 +86,7 @@ class _LaptopState extends State<Laptop> {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> product = {
+    final product = {
       'name': 'The MacBook M3 ',
       'imageUrl': 'lib/Assets/mac.png',
       'price': '₹ 78000/-',
@@ -126,15 +129,15 @@ class _LaptopState extends State<Laptop> {
                 ),
               ),
               const SizedBox(height: 15),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Hero(
-                  tag: 'laptop',
-                  child: Image.asset(
-                    'lib/Assets/mac.png',
-                    fit: BoxFit.cover,
-                    height: Get.height * 0.35,
-                    width: Get.width,
+              Container(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Hero(
+                    tag: 'laptop',
+                    child: Image.asset(
+                      'lib/Assets/mac.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               ),

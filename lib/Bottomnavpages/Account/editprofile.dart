@@ -23,6 +23,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController(); // Added for password
 
   File? _imageFile;
   String? _currentImagePath;
@@ -43,32 +44,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     try {
-      print('Fetching data for UID: ${user.uid}');
-      DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
+      DocumentSnapshot doc = await _firestore.collection('User').doc(user.uid).get();
       if (doc.exists) {
         var data = doc.data() as Map<String, dynamic>;
-        print('Fetched data: $data');
         setState(() {
           nameController.text = data['Name'] ?? '';
           emailController.text = data['email'] ?? user.email ?? '';
-          _currentImagePath = data['profileImage'];
-          userController.setUser(
-            nameController.text,
-            emailController.text,
-            _currentImagePath,
-          );
+          passwordController.text = data['password'] ?? ''; // Fetch password if stored
+          _currentImagePath = data['profileImage']; // Fetch profile image path (if exists)
+          // Update controller with fetched data
+          userController.setUser(nameController.text, emailController.text, _currentImagePath);
         });
       } else {
-        print('No document found for UID: ${user.uid}');
-        setState(() {
-          nameController.text = userController.username.value;
-          emailController.text = loginController.email.value.isNotEmpty
-              ? loginController.email.value
-              : user.email ?? '';
-        });
+        Get.snackbar('Error', 'No user data found for this account. Please sign up.',
+            snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
       }
     } catch (e) {
-      print('Error fetching user data: $e');
       Get.snackbar('Error', 'Failed to fetch user data: $e',
           snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
     }
@@ -91,11 +82,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
       String path = "Imagedata/$fileName";
 
-      print('Uploading image to Supabase: $path');
       await Supabase.instance.client.storage.from('Imagedata').upload(path, _imageFile!);
 
       if (_currentImagePath != null) {
-        print('Removing old image from Supabase: $_currentImagePath');
         await Supabase.instance.client.storage.from('Imagedata').remove([_currentImagePath!]);
       }
 
@@ -103,7 +92,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           snackPosition: SnackPosition.TOP, colorText: Colors.white);
       return path;
     } catch (e) {
-      print('Error uploading image to Supabase: $e');
       Get.snackbar("Error", "Failed to upload image: $e",
           snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
       return null;
@@ -119,46 +107,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     try {
-      print('Saving profile for UID: ${user.uid}');
       String? newImagePath = await _uploadImageToSupabase();
 
-      // Prepare data to save (excluding password since it's not edited here)
       Map<String, dynamic> userData = {
-        'Name': nameController.text.trim(),
-        'email': emailController.text.trim(),
-        'profileImage': newImagePath ?? _currentImagePath,
+        'Name': nameController.text,
+        'email': emailController.text,
+        'password': passwordController.text, // Storing password in Firestore
+        'profileImage': newImagePath ?? _currentImagePath, // Store image path (if exists)
       };
 
-      print('Data to save: $userData');
-
-      DocumentReference docRef = _firestore.collection('users').doc(user.uid);
-      DocumentSnapshot doc = await docRef.get();
-
+      DocumentSnapshot doc = await _firestore.collection('User').doc(user.uid).get();
       if (doc.exists) {
-        print('Updating existing document');
-        await docRef.update(userData);
+        await _firestore.collection('User').doc(user.uid).update(userData);
         Get.snackbar("Success", "Profile Updated!",
             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
+        // Update user controller with new data
+        userController.setUser(nameController.text, emailController.text, newImagePath ?? _currentImagePath);
+        Get.back();
       } else {
-        print('Creating new document');
-        // Include password from existing data if available, or skip if not needed
-        if (doc.data() != null) {
-          var existingData = doc.data() as Map<String, dynamic>;
-          userData['password'] = existingData['password']; // Preserve password if exists
-        }
-        await docRef.set(userData);
-        Get.snackbar("Success", "Profile Created!",
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
+        Get.snackbar('Error', 'No user data found for this account. Please sign up.',
+            snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
       }
-
-      userController.setUser(
-        nameController.text.trim(),
-        emailController.text.trim(),
-        newImagePath ?? _currentImagePath,
-      );
-      Get.back();
     } catch (e) {
-      print('Error saving profile: $e');
       Get.snackbar('Error', 'Failed to save profile: $e',
           snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
     }
@@ -193,17 +163,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (confirm != true) return;
 
     try {
-      print('Deleting profile for UID: ${user.uid}');
-      if (_currentImagePath != null) {
-        await Supabase.instance.client.storage.from('Imagedata').remove([_currentImagePath!]);
+      DocumentSnapshot doc = await _firestore.collection('User').doc(user.uid).get();
+      if (doc.exists) {
+        if (_currentImagePath != null) {
+          await Supabase.instance.client.storage.from('Imagedata').remove([_currentImagePath!]);
+        }
+        await _firestore.collection('User').doc(user.uid).delete();
+        await _auth.signOut();
+        Get.offAllNamed('/login');
+        Get.snackbar("Success", "Profile Deleted!",
+            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
+      } else {
+        Get.snackbar('Error', 'No user data found for this account.',
+            snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
       }
-      await _firestore.collection('users').doc(user.uid).delete();
-      await _auth.signOut();
-      Get.offAllNamed(Routenames.login); // Use Routenames.login
-      Get.snackbar("Success", "Profile Deleted!",
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
     } catch (e) {
-      print('Error deleting profile: $e');
       Get.snackbar('Error', 'Failed to delete profile: $e',
           snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
     }
@@ -216,66 +190,77 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: const Text("Edit Profile"),
         backgroundColor: Colors.blue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: _pickImage,
-              child: Obx(() => CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.grey[300],
-                backgroundImage: _imageFile != null
-                    ? FileImage(_imageFile!)
-                    : userController.profileImageUrl.value.isNotEmpty
-                    ? NetworkImage(Supabase.instance.client.storage
-                    .from('Imagedata')
-                    .getPublicUrl(userController.profileImageUrl.value))
-                    : null,
-                child: _imageFile == null && userController.profileImageUrl.value.isEmpty
-                    ? const Icon(Icons.person, size: 50)
-                    : null,
-              )),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: "Username",
-                border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: _pickImage,
+                child: Obx(() => CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage: _imageFile != null
+                      ? FileImage(_imageFile!)
+                      : userController.profileImageUrl.value.isNotEmpty
+                      ? NetworkImage(Supabase.instance.client.storage
+                      .from('Imagedata')
+                      .getPublicUrl(userController.profileImageUrl.value))
+                      : null,
+                  child: _imageFile == null && userController.profileImageUrl.value.isEmpty
+                      ? const Icon(Icons.person, size: 50)
+                      : null,
+                )),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: "Email",
-                border: OutlineInputBorder(),
+              const SizedBox(height: 20),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: "Username",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveProfile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                minimumSize: const Size(double.infinity, 50),
+              const SizedBox(height: 10),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  border: OutlineInputBorder(),
+                ),
               ),
-              child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                _deleteProfile();
-                // Removed Get.toNamed(Routenames.account) as it conflicts with sign-out
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                minimumSize: const Size(double.infinity, 50),
+              const SizedBox(height: 10),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(
+                  labelText: "Password",
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true, // Hide password input
               ),
-              child: const Text("Delete Profile", style: TextStyle(color: Colors.white)),
-            ),
-          ],
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _saveProfile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  _deleteProfile();
+                  Get.toNamed(Routenames.account);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text("Delete Profile", style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:takeittt/components/rightangletriangle.dart';
+import 'package:takeittt/pages/Wallet.dart';
 
 class HomeTopContainer extends StatefulWidget {
   const HomeTopContainer({Key? key}) : super(key: key);
@@ -94,22 +95,37 @@ class _HomeTopContainerState extends State<HomeTopContainer> {
             ),
 
             Positioned(
-              right: Get.width*0.03,
-              top: Get.width*0.125,
-              child: Row(children: [
-                Text('Wallet'.tr,
-                  style: GoogleFonts.poppins(
-                      color: Colors.black,
-                      fontSize: Get.width*0.049,
-                      fontWeight: FontWeight.bold
-
-                  ),),
-                Padding(
-                  padding: EdgeInsets.all(3.0),
-                  child: Icon(Icons.account_balance_wallet),
-                )
-              ],),
-            )
+              right: Get.width * 0.03,
+              top: Get.width * 0.125,
+              child: InkWell(
+                onTap: () {
+                  Get.to(() => WalletScreen());
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: EdgeInsets.all(Get.width * 0.015),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Wallet'.tr,
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: Get.width * 0.049,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: Get.width * 0.01),
+                      Icon(
+                        Icons.account_balance_wallet,
+                        size: Get.width * 0.06,
+                        color: Colors.black,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
     );

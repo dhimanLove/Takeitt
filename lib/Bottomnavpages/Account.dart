@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:takeittt/Bottomnavpages/Account/QuestandAns.dart';
+import 'package:takeittt/Bottomnavpages/Account/Wishlist.dart';
+import 'package:takeittt/Bottomnavpages/Account/review.dart';
 import 'package:takeittt/components/mydrawer.dart';
 import 'package:takeittt/components/searchdelegate.dart';
 import 'package:takeittt/routes/routenames.dart';
@@ -37,7 +40,7 @@ class _AccountState extends State<Account> {
 
     try {
       DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('User')
           .doc(currentUser!.uid)
           .get();
 
@@ -45,7 +48,7 @@ class _AccountState extends State<Account> {
         debugPrint('Document exists: ${doc.data()}');
         setState(() {
           userStream = FirebaseFirestore.instance
-              .collection('users')
+              .collection('User')
               .doc(currentUser!.uid)
               .snapshots();
         });
@@ -86,7 +89,7 @@ class _AccountState extends State<Account> {
         var userData = snapshot.data!.data() as Map<String, dynamic>;
         debugPrint('Fetched user data: $userData');
 
-        // Construct the full Supabase URL
+        // Fetch the profile image URL from Supabase
         String? imageUrl = userData['profileImage'] != null
             ? Supabase.instance.client.storage
             .from('Imagedata')
@@ -100,11 +103,9 @@ class _AccountState extends State<Account> {
               tag: 'ran',
               child: CircleAvatar(
                 radius: 60,
-                //backgroundColor: Colors.red,
+                backgroundColor: Colors.grey,
+                // Only set backgroundImage if imageUrl is not null
                 backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
-                onBackgroundImageError: (exception, stackTrace) {
-                  debugPrint('Error loading image: $exception');
-                },
                 child: imageUrl == null
                     ? const Icon(Icons.person, size: 60, color: Colors.white)
                     : null,
@@ -169,14 +170,12 @@ class _AccountState extends State<Account> {
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Container(
-                  decoration: const BoxDecoration(
-                  ),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -214,7 +213,7 @@ class _AccountState extends State<Account> {
                 leading: const Icon(Icons.card_giftcard),
                 title: const Text('Refer And Earn'),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () => Get.to(() =>  ReferAndEarnPage()),
+                onTap: () => Get.to(() => ReferAndEarnPage()),
               ),
               ListTile(
                 leading: const Icon(Icons.shopping_cart),
@@ -226,20 +225,26 @@ class _AccountState extends State<Account> {
                 leading: const Icon(Icons.favorite),
                 title: const Text('Wishlist'),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {},
+                onTap: () {
+                  Get.to(WishlistScreen());
+                },
               ),
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.reviews),
                 title: const Text('Reviews'),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {},
+                onTap: () {
+                  Get.to(ReviewScreen());
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.question_answer),
                 title: const Text('Question & Answers'),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {},
+                onTap: () {
+                  Get.to(FAQScreen());
+                },
               ),
               Padding(
                 padding: const EdgeInsets.all(15),
@@ -252,8 +257,7 @@ class _AccountState extends State<Account> {
                     await _auth.signOut();
                     Get.offAllNamed(Routenames.login);
                   },
-                  child: const Text('Log Out',
-                      style: TextStyle(color: Colors.white)),
+                  child: const Text('Log Out', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],
@@ -263,5 +267,3 @@ class _AccountState extends State<Account> {
     );
   }
 }
-
-const BorderSide customBorderSide = BorderSide(color: Colors.grey, width: 1.0);

@@ -54,7 +54,7 @@ class _HomepageRow2State extends State<HomepageRow2> {
                   Column(
                     children: [
                       Text(
-                          'Tv & Laptop',
+                          'Tv & LCD',
                           style: GoogleFonts.ubuntu(
                             fontSize: 12,
                           )
@@ -105,7 +105,7 @@ class _HomepageRow2State extends State<HomepageRow2> {
                             )
                         ),
                         Text(
-                          'From \$200/M',
+                          'From \$20/M',
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,),
@@ -134,8 +134,8 @@ class _HomepageRow2State extends State<HomepageRow2> {
                           padding: const EdgeInsets.all(8.0),
                           child: Hero(
                             tag: 'laptop',
-                            child: Image.network(
-                              'https://www.apple.com/newsroom/images/2023/10/apple-unveils-new-macbook-pro-featuring-m3-chips/article/Apple-MacBook-Pro-top-view-231030_big.jpg.large.jpg',
+                            child: Image.asset(
+                              'lib/Assets/mac.png',
                               fit: BoxFit.cover,
                               height: Get.height * 0.1,
                               width: Get.width * 0.3,

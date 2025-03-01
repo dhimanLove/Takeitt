@@ -35,7 +35,7 @@ dependencies:
 
   # File and Storage Management
   path_provider:
-  get_storage:
+  get_storage: ^2.1.1
   flutter_dotenv:
   cached_network_image:
 
@@ -59,6 +59,7 @@ dependencies:
   font_awesome_flutter:
   google_fonts:
   cupertino_icons:
+  shimmer:
   fl_chart:
   getwidget:
   gradient_icon:
@@ -100,6 +101,7 @@ dependencies:
 
   #Maps
   flutter_map:
+  flutter_map_location_marker:
   location:
   latlong2:
   syncfusion_flutter_maps:
@@ -107,6 +109,7 @@ dependencies:
   #sharing feature clipboard
   share_plus:
   lucide_icons: ^0.257.0
+  flutter_rating_bar: ^4.0.1
 
 
 dev_dependencies:

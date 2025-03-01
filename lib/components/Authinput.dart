@@ -125,10 +125,10 @@ class _AuthinputState extends State<Authinput> {
           prefixIcon: widget.prefixIcon,
           suffixIcon: widget.isapasswordfield ||widget.isconfirmpasswordfield
               ? IconButton(
-            icon: const Icon(Icons.visibility_off),
+            icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
             onPressed: () {
               setState(() {
-                obscureText = !obscureText; // by this logic we can toggle between pasword ki visibility and ye sb aise , ke pele wo obs text confirmpass and pass ko verify krke true kr dega khudko , ab setstate se hamne usme "!" use krke uski state ko reverse kr diya ab har click pe jo uski value hui h pehle click pe uski pposite  hojayegi next click pe , so it' done
+                obscureText = !obscureText;
               });
             },
           )

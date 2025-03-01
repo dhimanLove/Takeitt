@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:takeittt/components/searchdelegate.dart';
 
 class Cart extends StatefulWidget {
   const Cart({super.key});
@@ -12,21 +13,60 @@ class Cart extends StatefulWidget {
 
 class _CartState extends State<Cart> {
   final storage = GetStorage();
+  late List cartProducts;
+  late List favoritesProducts;
 
   @override
-  Widget build(BuildContext context) {
-    List cartProducts = storage.read('cart_products') ?? [];
-    List favoritesProducts = storage.read('Fav_products') ?? [];
+  void initState() {
+    super.initState();
 
-    // Calculate total price for cart
-    int totalPrice = cartProducts.fold(0, (sum, item) {
+    cartProducts = List.from(storage.read('cart_products') ?? []);
+    favoritesProducts = List.from(storage.read('Fav_products') ?? []);
+  }
+
+  void removeFromWishlist(int index) {
+    setState(() {
+      favoritesProducts.removeAt(index);
+      storage.write('Fav_products', favoritesProducts);
+      Get.snackbar(
+        'Favorites',
+        'Removed from Favorites',
+        backgroundColor: Colors.red[200],
+        duration: const Duration(milliseconds: 800),
+      );
+    });
+  }
+
+
+  int calculateTotalPrice(List products) {
+    return products.fold(0, (sum, item) {
       String priceStr = item['price']?.toString().replaceAll(RegExp(r'[^\d]'), '') ?? '0';
       int price = int.tryParse(priceStr) ?? 0;
       int quantity = int.tryParse(item['quantity']?.toString() ?? '1') ?? 1;
       return sum + (price * quantity);
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    int totalPrice = calculateTotalPrice(cartProducts);
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
+        leading: IconButton(onPressed: (){}, icon: Icon(Icons.menu,color: Colors.white,)),
+        title: Text("Appbar",style: TextStyle(
+          color: Colors.white,
+          fontSize: 20
+        ),),
+        actions: [
+          IconButton(
+            onPressed: () =>
+                showSearch(context: context, delegate: MySearchDelegate()),
+            icon: const Icon(Icons.search, color: Colors.white),
+          ),
+          IconButton(onPressed: (){}, icon: Icon(Icons.mic,color: Colors.white,)),
+        ],
+      ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -34,18 +74,17 @@ class _CartState extends State<Cart> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Favorites Section in the Container
                   Container(
                     width: Get.width,
-                    height: Get.height * 0.4,
-                    color: Colors.grey[300],
+                    height: Get.height * 0.5,
+                    color: Colors.white,
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Favorites',
-                          style: TextStyle(
+                        Text(
+                          'Wishlist',
+                          style: GoogleFonts.poppins(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -53,27 +92,35 @@ class _CartState extends State<Cart> {
                         ),
                         const SizedBox(height: 10),
                         favoritesProducts.isNotEmpty
-                            ? SizedBox(
-                          height: Get.height * 0.3,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: favoritesProducts.length,
-                            itemBuilder: (context, index) {
-                              var product = favoritesProducts[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: Column(
+                            ? ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: favoritesProducts.length,
+                          itemBuilder: (context, index) {
+                            var product = favoritesProducts[index];
+                            return Card(
+                              elevation: 2,
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Stack(
                                   children: [
-                                    Stack(
+
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
+
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
                                           child: product['imageUrl']?.startsWith('http') ?? false
                                               ? Image.network(
                                             product['imageUrl']!,
                                             fit: BoxFit.cover,
-                                            height: Get.height * 0.2,
-                                            width: Get.width * 0.3,
+                                            height: 120,
+                                            width: 80,
                                             loadingBuilder: (context, child, loadingProgress) {
                                               if (loadingProgress == null) return child;
                                               return const Center(child: CircularProgressIndicator());
@@ -82,70 +129,89 @@ class _CartState extends State<Cart> {
                                               : Image.asset(
                                             product['imageUrl'] ?? 'assets/images/placeholder.png',
                                             fit: BoxFit.cover,
-                                            height: Get.height * 0.2,
-                                            width: Get.width * 0.3,
+                                            height: 120,
+                                            width: 80,
                                           ),
                                         ),
-                                        Positioned(
-                                          top: 5,
-                                          right: 5,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                favoritesProducts.removeAt(index);
-                                                storage.write('Fav_products', favoritesProducts);
-                                                Get.snackbar(
-                                                  'Favorites',
-                                                  'Removed from favorites',
-                                                  duration: const Duration(milliseconds: 800),
-                                                );
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.delete,
-                                              color: Colors.red,
-                                              size: 24,
+
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  product['name'] ?? 'Product',
+                                                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '\$${product['price'] ?? '0'}',
+                                                  style: GoogleFonts.poppins(fontSize: 16, color: Colors.green),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                ElevatedButton(
+                                                  onPressed: () {
+
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.yellow.shade700,
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(5),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Shop Now',
+                                                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.black),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      (product['name'] ?? 'Product Name').toString(),
-                                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      product['price']?.toString() ?? 'N/A',
-                                      style: const TextStyle(fontSize: 12),
+
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          removeFromWishlist(index);
+                                        },
+                                        icon: const Icon(Icons.favorite, color: Colors.red),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                      ),
                                     ),
                                   ],
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
                         )
-                            : const Center(
+                            : Center(
                           child: Text(
-                            'Your favorites list is empty ❤️',
-                            style: TextStyle(fontSize: 20, color: Colors.grey),
+                            'Your wishlist is empty ❤️',
+                            style: GoogleFonts.poppins(fontSize: 20, color: Colors.grey),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  // Cart Section Below
+
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Cart',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -253,47 +319,48 @@ class _CartState extends State<Cart> {
                                           ],
                                         ),
                                         const SizedBox(width: 10),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              child: Text(
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
                                                 (product['name'] ?? 'Product Name').toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 13,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              product['price']?.toString() ?? 'Price not available',
-                                              style: const TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.w400,
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                product['price']?.toString() ?? 'Price not available',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
                                               ),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  cartProducts.removeAt(index);
-                                                  storage.write('cart_products', cartProducts);
-                                                  Get.snackbar(
-                                                    'Cart',
-                                                    'Removed from cart',
-                                                    duration: const Duration(milliseconds: 800),
-                                                  );
-                                                });
-                                              },
-                                              icon: const Icon(
-                                                Icons.delete,
-                                                color: Colors.red,
-                                                size: 30,
+                                              IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    cartProducts.removeAt(index);
+                                                    storage.write('cart_products', cartProducts);
+                                                    Get.snackbar(
+                                                      'Cart',
+                                                      'Removed from cart',
+                                                      backgroundColor: Colors.red[200],
+                                                      duration: const Duration(milliseconds: 800),
+                                                    );
+                                                  });
+                                                },
+                                                icon: const Icon(
+                                                  Icons.delete,
+                                                  color: Colors.red,
+                                                  size: 30,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -303,21 +370,20 @@ class _CartState extends State<Cart> {
                             );
                           },
                         )
-                            : const Center(
+                            : Center(
                           child: Text(
                             'Your cart is empty 🛒',
-                            style: TextStyle(fontSize: 20, color: Colors.grey),
+                            style: GoogleFonts.poppins(fontSize: 20, color: Colors.grey),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 80), // Space for the Proceed to Buy button
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
 
-            // Proceed to Buy Button (Cart only)
             if (cartProducts.isNotEmpty)
               Positioned(
                 bottom: 20,
@@ -335,16 +401,16 @@ class _CartState extends State<Cart> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Proceed to Buy',
-                            style: TextStyle(
-                              fontSize: 22,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
                               color: Colors.black,
                             ),
                           ),
                           Text(
                             'Total: ₹$totalPrice',
-                            style: const TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
