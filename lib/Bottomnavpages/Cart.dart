@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:takeittt/components/mydrawer.dart';
 import 'package:takeittt/components/searchdelegate.dart';
 
 class Cart extends StatefulWidget {
@@ -51,8 +52,10 @@ class _CartState extends State<Cart> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
-        leading: IconButton(onPressed: (){}, icon: Icon(Icons.menu, color: Colors.white)),
-        title: Text("Appbar", style: TextStyle(color: Colors.white, fontSize: 20)),
+        leading: IconButton(onPressed: (){
+          Scaffold.of(context).openDrawer();
+        }, icon: Icon(Icons.menu, color: Colors.white)),
+        title: Text("Cart", style: TextStyle(color: Colors.white, fontSize: 22)),
         actions: [
           IconButton(
             onPressed: () => showSearch(context: context, delegate: MySearchDelegate()),
@@ -61,6 +64,7 @@ class _CartState extends State<Cart> {
           IconButton(onPressed: (){}, icon: Icon(Icons.mic, color: Colors.white)),
         ],
       ),
+      drawer: MyDrawer(),
       body: SafeArea(
         child: Stack(
           children: [

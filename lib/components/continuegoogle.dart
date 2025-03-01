@@ -16,13 +16,17 @@ class Googlecont extends StatefulWidget {
 }
 
 class _GooglecontState extends State<Googlecont> {
-
   Future<void> loginWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      // Ensure GoogleSignIn is properly initialized
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+          scopes: ['email'] // Add required scopes
+      );
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google Sign-In canceled by user')),
+          const SnackBar(content: Text('Google Sign-In canceled by user')),
         );
         return;
       }
@@ -41,65 +45,58 @@ class _GooglecontState extends State<Googlecont> {
           'name': userCredential.user!.displayName,
           'profilePic': userCredential.user!.photoURL,
           'uid': userCredential.user!.uid,
+          'lastLogin': FieldValue.serverTimestamp(),
         };
 
         try {
-          await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userCredential.user!.uid)
+              .set(
             userData,
             SetOptions(merge: true),
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('User data saved successfully')),
+            const SnackBar(content: Text('Successfully signed in with Google')),
           );
 
-          Navigator.pushReplacementNamed(context, '/home');
+          // Using GetX navigation instead of Navigator if you're using GetX
+          Get.offAllNamed('/home');
         } catch (e) {
-          print("Error saving user data to Firestore: $e");
-          if (e is FirebaseException) {
-            print("Firebase error code: ${e.code}");
-            print("Firebase error message: ${e.message}");
-          } else if (e is PlatformException) {
-            print("Platform exception: ${e.code}");
-            print("Platform exception message: ${e.message}");
-          } else {
-            print("Unexpected error: $e");
-          }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to save user data to Firestore')),
+            SnackBar(content: Text('Error saving user data: ${e.toString()}')),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to retrieve user details')),
+          const SnackBar(content: Text('Failed to retrieve user details')),
         );
       }
-
-      print("Signed in as: ${userCredential.user?.email}");
-    } catch (e) {
-      print("Error signing in with Google: $e");
+    } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error signing in with Google')),
+        SnackBar(content: Text('Firebase Auth Error: ${e.message}')),
+      );
+    } on PlatformException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Platform Error: ${e.message}')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unexpected error: ${e.toString()}')),
       );
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
-        loginWithGoogle(context);
-      },
+      onTap: () => loginWithGoogle(context),
       child: Container(
-        margin: EdgeInsets.symmetric(
-          horizontal: 35,
-        ),
-        height: Get.height*0.05,
-        width: MediaQuery.of(context).size.width * 2,
+        margin: const EdgeInsets.symmetric(horizontal: 35),
+        height: Get.height * 0.05,
+        width: MediaQuery.of(context).size.width, // Fixed width issue
         decoration: BoxDecoration(
-          //color: Colors.orange,
           border: Border.all(
             color: Colors.grey,
             width: 1,
@@ -107,16 +104,15 @@ class _GooglecontState extends State<Googlecont> {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal:25
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.network(
                 'https://s3-alpha-sig.figma.com/img/9690/3368/9b71a1845255c9f583f1866f305d4aec?Expires=1740960000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qSoDog1bZhYI62gj6qto4VuWr75rwgv~p2cvqbNEayOhkl0f1~mS76vD4Hqok1bndTp85LYbjuA85uxRKA2Z6tlga-zTsB8qThtNthIsy2WWudgs~nZGOgm07cw7TtCfwZ1rw06FyUcnWYdDr7OihL2v2LzHX58MgDaKVWBkrG~UtA72SWZgYjzlkh9xy6sMZ6ORs9Oto54FP~EKslO5X2StE0xW72zaxmOaCNWK6bC-l7S3V2FpAe~qFgsRMTfFZKtR9Ox2seD6NGFrpLJDyWRsykxS4lmqgpRchCZGcscdo5IVTdlL059N~1WFuSh1JbBhVEr8TY3BjGtZHJqQkw__',
-                height: Get.height*0.027,
+                height: Get.height * 0.027,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 'Continue with Google',
                 style: GoogleFonts.inter(

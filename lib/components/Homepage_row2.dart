@@ -184,9 +184,9 @@ class _HomepageRow2State extends State<HomepageRow2> {
                         height: Get.height * 0.11,
                         width: Get.width * 0.3,
                         child: Hero(
-                          tag: 'Slkincare',
+                          tag: 'Skincare',
                           child: FadeInImage(
-                            placeholder: AssetImage('assets/placeholder.png'),
+                            placeholder:NetworkImage('https://cdn0.iconfinder.com/data/icons/workly-startup-work-environment-character/256/2._Work_In_Beanbag.png'),
                             image: AssetImage('lib/Assets/cosmetic.png'),
                             fadeInDuration: Duration(milliseconds: 300),
                           ),

@@ -9,12 +9,12 @@ class WishlistScreen extends StatefulWidget {
 
 class _WishlistScreenState extends State<WishlistScreen> {
   final storage = GetStorage();
-  List wishlistItems = []; // Remove 'late' and initialize with empty list
+  List wishlistItems = [];
 
   @override
   void initState() {
     super.initState();
-    // Load wishlist items from storage when the widget initializes
+
     wishlistItems = List.from(storage.read('Fav_products') ?? []);
   }
 

@@ -11,7 +11,7 @@ class GoogleSignInProvider {
   Future<UserCredential?> signInWithGoogle() async {
     try {
       print("Attempting Google sign-in...");
-      await _googleSignIn.signOut(); // Ensure fresh sign-in
+      await _googleSignIn.signOut();
 
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
@@ -53,16 +53,12 @@ class GoogleSignInProvider {
       await userRef.set({
         'uid': user.uid,
         'name': user.displayName ?? "No Name",
-        'email': user.email ?? "No Email",
+        'email': user.email ?? "Email to dali hi ni thi",
         'profilePic': user.photoURL ?? "",
         'createdAt': FieldValue.serverTimestamp(),
-      }).then((_) {
-        print(" User added to Firestore: ${user.email}");
-      }).catchError((error) {
-        print(" Firestore write error: $error");
       });
     } else {
-      print("⚠ User already exists in Firestore.");
+      print(" User already exists in Firestore.");
     }
   }
 
@@ -85,34 +81,6 @@ class GoogleSignInProvider {
   }
 }
 
-/// Google Sign-In Function
-Future<void> signInWithGoogle(BuildContext context) async {
-  try {
-    final GoogleSignInProvider googleSignInProvider = GoogleSignInProvider();
-    final UserCredential? userCredential = await googleSignInProvider.signInWithGoogle();
-    if (userCredential == null) return;
-
-    User? user = userCredential.user;
-    if (user != null) {
-      print("Checking if user exists in Firestore...");
-
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-
-      if (userDoc.exists) {
-        print("Existing user detected. Navigating to Home...");
-        Navigator.pushReplacementNamed(context, '/home');
-      } else {
-        print("New user detected. Navigating to Signup...");
-        Navigator.pushReplacementNamed(context, '/signup');
-      }
-    }
-  } catch (error) {
-    print("Google Sign-In Error: $error");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Failed to sign in with Google. Please try again.")),
-    );
-  }
-}
 
 /// Google Sign-Up Function
 Future<void> signUpWithGoogle(BuildContext context) async {

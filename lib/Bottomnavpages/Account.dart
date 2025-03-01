@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:takeittt/Bottomnavpages/Account/Myorders.dart';
 import 'package:takeittt/Bottomnavpages/Account/QuestandAns.dart';
 import 'package:takeittt/Bottomnavpages/Account/Wishlist.dart';
 import 'package:takeittt/Bottomnavpages/Account/review.dart';
@@ -219,7 +220,9 @@ class _AccountState extends State<Account> {
                 leading: const Icon(Icons.shopping_cart),
                 title: const Text('My Orders'),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {},
+                onTap: () {
+                 Get.to(MyOrdersScreen());
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.favorite),

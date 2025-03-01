@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:shimmer/shimmer.dart';
 
 class Mobile extends StatefulWidget {
   const Mobile({super.key});
@@ -10,16 +12,17 @@ class Mobile extends StatefulWidget {
 }
 
 class _MobileState extends State<Mobile> {
-  bool isFavorited = false; // Track favorite state in the state class
+  bool isFavorited = false;
   final storage = GetStorage();
-  late List favoritesProducts; // List for favorites
+  late List favoritesProducts;
+
 
   @override
   void initState() {
     super.initState();
-    // Initialize favorites list from storage
+
     favoritesProducts = List.from(storage.read('Fav_products') ?? []);
-    // Check if the product is already in favorites
+
     isFavorited = _isProductInFavorites({
       'name': 'iPhone 16 Pro',
       'imageUrl': 'https://itronics.in/wp-content/uploads/2024/09/iPhone_16_Pro_Natural_Titanium_PDP_Image_Position_1__en-IN.png',
@@ -111,7 +114,7 @@ class _MobileState extends State<Mobile> {
                     const SizedBox(width: 30),
                     IconButton(
                       onPressed: () {
-                        toggleFavorite(product); // Toggle favorite state
+                        toggleFavorite(product);
                       },
                       icon: Icon(
                         isFavorited ? Icons.favorite : Icons.favorite_border,
@@ -127,12 +130,17 @@ class _MobileState extends State<Mobile> {
                 borderRadius: BorderRadius.circular(20),
                 child: Hero(
                   tag: 'Mobile',
-                  child: Image.network(
-                    'https://itronics.in/wp-content/uploads/2024/09/iPhone_16_Pro_Natural_Titanium_PDP_Image_Position_1__en-IN.png',
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: Colors.grey[500]!,
+                      highlightColor: Colors.grey[200]!,
+                      child: Container(color: Colors.grey),
+                    ),
+                    imageUrl: 'https://itronics.in/wp-content/uploads/2024/09/iPhone_16_Pro_Natural_Titanium_PDP_Image_Position_1__en-IN.png',
                     fit: BoxFit.cover,
                     height: Get.height * 0.4,
                     width: Get.width,
-                  ),
+                  )
                 ),
               ),
               const SizedBox(height: 20),

@@ -10,16 +10,15 @@ class Slkincare extends StatefulWidget {
 }
 
 class _SlkincareState extends State<Slkincare> {
-  bool isFavorited = false; // Track favorite state
+  bool isFavorited = false;
   final storage = GetStorage();
-  late List favoritesProducts; // List for favorites
+  late List favoritesProducts;
 
   @override
   void initState() {
     super.initState();
-    // Initialize favorites list from storage
+
     favoritesProducts = List.from(storage.read('Fav_products') ?? []);
-    // Check if the product is already in favorites
     isFavorited = _isProductInFavorites({
       'name': 'Skincare',
       'imageUrl': 'lib/Assets/cosmetic.png',
@@ -28,11 +27,11 @@ class _SlkincareState extends State<Slkincare> {
     });
   }
 
-  bool _isProductInFavorites(Map<String, dynamic> product) {
+  bool _isProductInFavorites( product) {
     return favoritesProducts.any((item) => item['name'] == product['name']);
   }
 
-  void toggleFavorite(Map<String, dynamic> product) {
+  void toggleFavorite(product) {
     setState(() {
       isFavorited = !isFavorited;
 
@@ -44,12 +43,12 @@ class _SlkincareState extends State<Slkincare> {
         favoritesProducts.removeWhere((item) => item['name'] == product['name']);
         storage.write('Fav_products', favoritesProducts);
         Get.snackbar('Favorites', 'Removed from Favorites!',
-            backgroundColor: Colors.red[200], duration: const Duration(milliseconds: 800));
+            backgroundColor: Colors.red[300], duration: const Duration(milliseconds: 600));
       } else {
         favoritesProducts.add(product);
         storage.write('Fav_products', favoritesProducts);
         Get.snackbar('Favorites', 'Added to Favorites!',
-            backgroundColor: Colors.green[200], duration: const Duration(milliseconds: 800));
+            backgroundColor: Colors.green[300], duration: const Duration(milliseconds: 800));
       }
     });
   }
@@ -83,7 +82,7 @@ class _SlkincareState extends State<Slkincare> {
     final product = {
       'name': 'Skincare',
       'imageUrl': 'lib/Assets/cosmetic.png',
-      'price': '780', // Updated to match the UI price (₹780)
+      'price': '₹ 780',
       'quantity': 1,
     };
 

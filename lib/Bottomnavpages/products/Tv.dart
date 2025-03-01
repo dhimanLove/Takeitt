@@ -83,7 +83,7 @@ class _TvState extends State<Tv> {
     final product = {
       'name': 'Samsung LCD',
       'imageUrl': 'https://www.figma.com/file/4fsrPVHqwtxNSPbVMPcchJ/image/462a73798c40c255812e19897c08f9831a88c4f0',
-      'price': '1200', // Updated to match the UI price ($1200)
+      'price': '1200',
       'quantity': 1,
     };
 
