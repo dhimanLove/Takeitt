@@ -33,7 +33,7 @@ class _MapsState extends State<Maps> {
         options: MapOptions(
           initialCenter:
               LatLng(28.6139, 77.2090), // New Delhi, India ka location
-          initialZoom: 10, // Shows most of India
+          initialZoom: 1,
         ),
         children: [
           TileLayer(

@@ -18,9 +18,8 @@ class Googlecont extends StatefulWidget {
 class _GooglecontState extends State<Googlecont> {
   Future<void> loginWithGoogle(BuildContext context) async {
     try {
-      // Ensure GoogleSignIn is properly initialized
       final GoogleSignIn googleSignIn = GoogleSignIn(
-          scopes: ['email'] // Add required scopes
+          scopes: ['email']
       );
 
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
@@ -61,7 +60,7 @@ class _GooglecontState extends State<Googlecont> {
             const SnackBar(content: Text('Successfully signed in with Google')),
           );
 
-          // Using GetX navigation instead of Navigator if you're using GetX
+
           Get.offAllNamed('/home');
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -95,7 +94,7 @@ class _GooglecontState extends State<Googlecont> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 35),
         height: Get.height * 0.05,
-        width: MediaQuery.of(context).size.width, // Fixed width issue
+        width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           border: Border.all(
             color: Colors.grey,
@@ -109,7 +108,7 @@ class _GooglecontState extends State<Googlecont> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.network(
-                'https://s3-alpha-sig.figma.com/img/9690/3368/9b71a1845255c9f583f1866f305d4aec?Expires=1740960000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qSoDog1bZhYI62gj6qto4VuWr75rwgv~p2cvqbNEayOhkl0f1~mS76vD4Hqok1bndTp85LYbjuA85uxRKA2Z6tlga-zTsB8qThtNthIsy2WWudgs~nZGOgm07cw7TtCfwZ1rw06FyUcnWYdDr7OihL2v2LzHX58MgDaKVWBkrG~UtA72SWZgYjzlkh9xy6sMZ6ORs9Oto54FP~EKslO5X2StE0xW72zaxmOaCNWK6bC-l7S3V2FpAe~qFgsRMTfFZKtR9Ox2seD6NGFrpLJDyWRsykxS4lmqgpRchCZGcscdo5IVTdlL059N~1WFuSh1JbBhVEr8TY3BjGtZHJqQkw__',
+                'https://github.com/kartikkumarofficial/TakeIt/blob/master/assets/images/auth/google.png?raw=true',
                 height: Get.height * 0.027,
               ),
               const SizedBox(width: 10),

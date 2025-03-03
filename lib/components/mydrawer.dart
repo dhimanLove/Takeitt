@@ -6,9 +6,10 @@ import 'package:takeittt/Bottomnavpages/Account.dart';
 import 'package:takeittt/Bottomnavpages/Account/QuestandAns.dart';
 import 'package:takeittt/Bottomnavpages/Account/Refer_and_earn.dart';
 import 'package:takeittt/Bottomnavpages/Account/Wishlist.dart';
+import 'package:takeittt/Bottomnavpages/Account/coupons.dart';
 import 'package:takeittt/Bottomnavpages/Account/editprofile.dart';
 import 'package:takeittt/Bottomnavpages/Account/review.dart';
-import 'package:takeittt/pages/Wallet.dart';
+import 'package:takeittt/components/Wallet.dart';
 import 'package:takeittt/utils/user_controller.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -127,7 +128,9 @@ class MyDrawer extends StatelessWidget {
                     ),
                     SizedBox(height: Get.width * 0.05),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(ShoppingScreen());
+                      },
                       child: Text(
                         'Coupons',
                         style: TextStyle(

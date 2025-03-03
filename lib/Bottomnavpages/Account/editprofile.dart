@@ -23,7 +23,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController(); // Added for password
+  TextEditingController passwordController = TextEditingController();
 
   File? _imageFile;
   String? _currentImagePath;
@@ -38,8 +38,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _fetchUserData() async {
     final user = _auth.currentUser;
     if (user == null) {
-      Get.snackbar('Error', 'No user logged in',
-          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.rawSnackbar(
+        message: 'No user logged in',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
       return;
     }
 
@@ -50,18 +56,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         setState(() {
           nameController.text = data['Name'] ?? '';
           emailController.text = data['email'] ?? user.email ?? '';
-          passwordController.text = data['password'] ?? ''; // Fetch password if stored
-          _currentImagePath = data['profileImage']; // Fetch profile image path (if exists)
-          // Update controller with fetched data
+          passwordController.text = data['password'] ?? '';
+          _currentImagePath = data['profileImage'];
           userController.setUser(nameController.text, emailController.text, _currentImagePath);
         });
       } else {
-        Get.snackbar('Error', 'No user data found for this account. Please sign up.',
-            snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+        Get.rawSnackbar(
+          message: 'No user data found. Please sign up.',
+          backgroundColor: Colors.red,
+          snackPosition: SnackPosition.TOP,
+          borderRadius: 8,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(16),
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch user data: $e',
-          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.rawSnackbar(
+        message: 'Failed to fetch user data: $e',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
     }
   }
 
@@ -70,7 +87,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (image != null) {
       setState(() {
         _imageFile = File(image.path);
-        userController.setProfileImage(_imageFile!); // Temporary local file
+        userController.setProfileImage(_imageFile!);
       });
     }
   }
@@ -88,12 +105,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         await Supabase.instance.client.storage.from('Imagedata').remove([_currentImagePath!]);
       }
 
-      Get.snackbar("Success", "Image uploaded successfully",
-          snackPosition: SnackPosition.TOP, colorText: Colors.white);
+      Get.rawSnackbar(
+        message: 'Image uploaded successfully',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
       return path;
     } catch (e) {
-      Get.snackbar("Error", "Failed to upload image: $e",
-          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.rawSnackbar(
+        message: 'Failed to upload image: $e',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
       return null;
     }
   }
@@ -101,8 +130,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _saveProfile() async {
     final user = _auth.currentUser;
     if (user == null) {
-      Get.snackbar('Error', 'No user logged in',
-          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.rawSnackbar(
+        message: 'No user logged in',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
       return;
     }
 
@@ -112,48 +147,70 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       Map<String, dynamic> userData = {
         'Name': nameController.text,
         'email': emailController.text,
-        'password': passwordController.text, // Storing password in Firestore
-        'profileImage': newImagePath ?? _currentImagePath, // Store image path (if exists)
+        'password': passwordController.text,
+        'profileImage': newImagePath ?? _currentImagePath,
       };
 
       DocumentSnapshot doc = await _firestore.collection('User').doc(user.uid).get();
       if (doc.exists) {
         await _firestore.collection('User').doc(user.uid).update(userData);
-        Get.snackbar("Success", "Profile Updated!",
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
-        // Update user controller with new data
+        Get.rawSnackbar(
+          message: 'Profile Updated!',
+          backgroundColor: Colors.green,
+          snackPosition: SnackPosition.TOP,
+          borderRadius: 8,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(16),
+        );
         userController.setUser(nameController.text, emailController.text, newImagePath ?? _currentImagePath);
         Get.back();
       } else {
-        Get.snackbar('Error', 'No user data found for this account. Please sign up.',
-            snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+        Get.rawSnackbar(
+          message: 'No user data found. Please sign up.',
+          backgroundColor: Colors.red,
+          snackPosition: SnackPosition.TOP,
+          borderRadius: 8,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(16),
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save profile: $e',
-          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.rawSnackbar(
+        message: 'Failed to save profile: $e',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
     }
   }
 
   Future<void> _deleteProfile() async {
     final user = _auth.currentUser;
     if (user == null) {
-      Get.snackbar('Error', 'No user logged in',
-          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.rawSnackbar(
+        message: 'No user logged in',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
       return;
     }
 
-    bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    bool? confirm = await Get.dialog<bool>(
+      AlertDialog(
         title: const Text('Delete Profile'),
         content: const Text('Are you sure you want to delete your profile? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Get.back(result: false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Get.back(result: true),
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
@@ -170,16 +227,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         await _firestore.collection('User').doc(user.uid).delete();
         await _auth.signOut();
-        Get.offAllNamed('/login');
-        Get.snackbar("Success", "Profile Deleted!",
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
+        Get.offAllNamed(Routenames.login);
+        Get.rawSnackbar(
+          message: 'Profile Deleted!',
+          backgroundColor: Colors.green,
+          snackPosition: SnackPosition.TOP,
+          borderRadius: 8,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(16),
+        );
       } else {
-        Get.snackbar('Error', 'No user data found for this account.',
-            snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+        Get.rawSnackbar(
+          message: 'No user data found.',
+          backgroundColor: Colors.red,
+          snackPosition: SnackPosition.TOP,
+          borderRadius: 8,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(16),
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete profile: $e',
-          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.rawSnackbar(
+        message: 'Failed to delete profile: $e',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        borderRadius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16),
+      );
     }
   }
 
@@ -236,7 +311,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   labelText: "Password",
                   border: OutlineInputBorder(),
                 ),
-                obscureText: true, // Hide password input
+                obscureText: true,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -249,10 +324,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () {
-                  _deleteProfile();
-                  Get.toNamed(Routenames.account);
-                },
+                onPressed: _deleteProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: const Size(double.infinity, 50),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_fonts/google_fonts.dart';
@@ -7,15 +8,18 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:takeittt/Bottomnavpages/Account/Myorders.dart';
 import 'package:takeittt/Bottomnavpages/Account/QuestandAns.dart';
 import 'package:takeittt/Bottomnavpages/Account/Wishlist.dart';
+import 'package:takeittt/Bottomnavpages/Account/coupons.dart';
 import 'package:takeittt/Bottomnavpages/Account/review.dart';
 import 'package:takeittt/components/mydrawer.dart';
 import 'package:takeittt/components/searchdelegate.dart';
+import 'package:takeittt/components/Wallet.dart';
 import 'package:takeittt/routes/routenames.dart';
 import 'package:takeittt/Bottomnavpages/Account/editprofile.dart';
 import 'package:takeittt/Bottomnavpages/Account/Refer_and_earn.dart';
+import 'package:takeittt/utils/tabbar_controller.dart';
 
 class Account extends StatefulWidget {
-  const Account({super.key});
+  Account({super.key});
 
   @override
   State<Account> createState() => _AccountState();
@@ -63,18 +67,18 @@ class _AccountState extends State<Account> {
 
   Widget _buildUserData() {
     if (currentUser == null) {
-      return const Center(child: Text('No user logged in'));
+      return Center(child: Text('No user logged in'));
     }
 
     if (userStream == null) {
-      return const Center(child: Text('Initializing user data...'));
+      return Center(child: Text('Initializing user data...'));
     }
 
     return StreamBuilder<DocumentSnapshot>(
       stream: userStream,
       builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
@@ -84,7 +88,7 @@ class _AccountState extends State<Account> {
 
         if (!snapshot.hasData || !snapshot.data!.exists) {
           debugPrint('No data available for user: ${currentUser!.uid}');
-          return const Center(child: Text('No user data found'));
+          return Center(child: Text('No user data found'));
         }
 
         var userData = snapshot.data!.data() as Map<String, dynamic>;
@@ -93,34 +97,35 @@ class _AccountState extends State<Account> {
         // Fetch the profile image URL from Supabase
         String? imageUrl = userData['profileImage'] != null
             ? Supabase.instance.client.storage
-            .from('Imagedata')
-            .getPublicUrl(userData['profileImage'])
+                .from('Imagedata')
+                .getPublicUrl(userData['profileImage'])
             : null;
 
         return Column(
           children: [
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Hero(
               tag: 'ran',
               child: CircleAvatar(
                 radius: 60,
                 backgroundColor: Colors.grey,
                 // Only set backgroundImage if imageUrl is not null
-                backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+                backgroundImage:
+                    imageUrl != null ? NetworkImage(imageUrl) : null,
                 child: imageUrl == null
-                    ? const Icon(Icons.person, size: 60, color: Colors.white)
+                    ? Icon(Icons.person, size: 60, color: Colors.white)
                     : null,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               userData['Name'] ?? 'No Name',
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               userData['email'] ?? 'No Email',
-              style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
             ),
           ],
         );
@@ -135,48 +140,48 @@ class _AccountState extends State<Account> {
         leading: Builder(
           builder: (context) => IconButton(
             onPressed: () => Scaffold.of(context).openDrawer(),
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: Icon(Icons.menu, color: Colors.white),
           ),
         ),
         backgroundColor: Colors.blue,
-        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        title: Text('Profile', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
             onPressed: () =>
                 showSearch(context: context, delegate: MySearchDelegate()),
-            icon: const Icon(Icons.search, color: Colors.white),
+            icon: Icon(Icons.search, color: Colors.white),
           ),
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.mic, color: Colors.white),
+            icon: Icon(Icons.mic, color: Colors.white),
           ),
           IconButton(
             onPressed: () => Get.toNamed(Routenames.cart),
-            icon: const Icon(Icons.shopping_cart, color: Colors.white),
+            icon: Icon(Icons.shopping_cart, color: Colors.white),
           ),
         ],
       ),
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
           await _initializeUserStream();
-          await Future.delayed(const Duration(seconds: 1));
+          await Future.delayed(Duration(seconds: 1));
           Get.snackbar('Success', 'Page Reloaded',
               dismissDirection: DismissDirection.horizontal);
         },
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 20),
+                padding: EdgeInsets.only(top: 20),
                 child: Container(
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -188,79 +193,96 @@ class _AccountState extends State<Account> {
                                 shadows: [
                                   Shadow(
                                     color: Colors.black.withOpacity(0.5),
-                                    offset: const Offset(1, 0),
+                                    offset: Offset(1, 0),
                                     blurRadius: 4,
                                   ),
                                 ],
                               ),
                             ),
-                            const Icon(Icons.wallet_outlined, color: Colors.orangeAccent),
+                            IconButton(
+                              onPressed: () {
+                                Get.to(WalletScreen());
+                              },
+                              icon: Icon(Icons.wallet_outlined,
+                                  color: Colors.orangeAccent),
+                            )
                           ],
                         ),
                       ),
                       _buildUserData(),
-                      const Divider(thickness: 2),
+                      Divider(thickness: 2),
                       ListTile(
-                        leading: const Icon(Icons.person),
-                        title: const Text('Edit Profile'),
-                        trailing: const Icon(Icons.edit),
-                        onTap: () => Get.to(() => const EditProfileScreen()),
+                        leading: Icon(Icons.person),
+                        title: Text('Edit Profile'),
+                        trailing: Icon(Icons.edit),
+                        onTap: () => Get.to(() => EditProfileScreen()),
                       ),
                     ],
                   ),
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.card_giftcard),
-                title: const Text('Refer And Earn'),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                leading: Icon(Icons.card_giftcard),
+                title: Text('Refer And Earn'),
+                trailing: Icon(Icons.arrow_forward_ios),
                 onTap: () => Get.to(() => ReferAndEarnPage()),
               ),
               ListTile(
-                leading: const Icon(Icons.shopping_cart),
-                title: const Text('My Orders'),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                leading: Icon(
+                  FontAwesomeIcons.creditCard,
+                  size: 20,
+                ),
+                title: Text('Coupons'),
+                trailing: Icon(Icons.arrow_forward_ios_rounded),
                 onTap: () {
-                 Get.to(MyOrdersScreen());
+                  Get.to(ShoppingScreen());
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.favorite),
-                title: const Text('Wishlist'),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                leading: Icon(Icons.shopping_cart),
+                title: Text('My Orders'),
+                trailing: Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Get.to(MyOrdersScreen());
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.favorite),
+                title: Text('Wishlist'),
+                trailing: Icon(Icons.arrow_forward_ios),
                 onTap: () {
                   Get.to(WishlistScreen());
                 },
               ),
-              const Divider(),
+              Divider(),
               ListTile(
-                leading: const Icon(Icons.reviews),
-                title: const Text('Reviews'),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                leading: Icon(Icons.reviews),
+                title: Text('Reviews'),
+                trailing: Icon(Icons.arrow_forward_ios),
                 onTap: () {
                   Get.to(ReviewScreen());
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.question_answer),
-                title: const Text('Question & Answers'),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                leading: Icon(Icons.question_answer),
+                title: Text('Question & Answers'),
+                trailing: Icon(Icons.arrow_forward_ios),
                 onTap: () {
                   Get.to(FAQScreen());
                 },
               ),
               Padding(
-                padding: const EdgeInsets.all(15),
+                padding: EdgeInsets.all(15),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
-                    minimumSize: const Size(double.infinity, 40),
+                    minimumSize: Size(double.infinity, 40),
                   ),
                   onPressed: () async {
                     await _auth.signOut();
                     Get.offAllNamed(Routenames.login);
                   },
-                  child: const Text('Log Out', style: TextStyle(color: Colors.white)),
+                  child: Text('Log Out', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],

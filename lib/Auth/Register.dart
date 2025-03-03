@@ -40,7 +40,6 @@ class _RegisterState extends State<Register> {
           password: password.text,
         );
 
-        // Store user data in Firestore using the Firebase UID (no image data)
         Map<String, dynamic> userinfomap = {
           'Name': name.text,
           'email': email.text,
@@ -50,7 +49,7 @@ class _RegisterState extends State<Register> {
         await _firestore.collection('User').doc(userCredential.user!.uid).set(userinfomap);
 
         SuccessSnackbar();
-        Get.toNamed(
+        Get.offNamed(
           Routenames.gnav,
           arguments: {
             'Name': name.text,
@@ -62,14 +61,14 @@ class _RegisterState extends State<Register> {
         if (love.code == 'weak-password') {
           Get.snackbar('Error', 'The password provided is too weak.');
         } else if (love.code == 'email-already-in-use') {
-          // Handle existing user: Try to sign in or update their Firestore data
+
           try {
             UserCredential existingUserCredential = await _auth.signInWithEmailAndPassword(
               email: email.text,
               password: password.text,
             );
 
-            // Update or verify Firestore data for the existing user
+
             DocumentSnapshot doc = await _firestore.collection('User').doc(existingUserCredential.user!.uid).get();
             if (!doc.exists) {
               Map<String, dynamic> userinfomap = {
@@ -79,7 +78,7 @@ class _RegisterState extends State<Register> {
               };
               await _firestore.collection('User').doc(existingUserCredential.user!.uid).set(userinfomap);
             } else {
-              // Optionally update only changed fields (e.g., Name, password)
+
               Map<String, dynamic> updates = {};
               if (name.text.isNotEmpty && name.text != doc['Name']) updates['Name'] = name.text;
               if (userPassword.isNotEmpty && userPassword != doc['password']) updates['password'] = userPassword;
@@ -111,7 +110,6 @@ class _RegisterState extends State<Register> {
     if (formkey.currentState!.validate()) {
       String userPassword = password.text;
 
-      // Clear inputs
       email.clear();
       password.clear();
       confirmpassword.clear();
@@ -195,7 +193,7 @@ class _RegisterState extends State<Register> {
                             right: 13,
                             top: -5,
                             child: Image.network(
-                              'https://s3-alpha-sig.figma.com/img/1f18/cb2b/2d5474c3df4060657a67836c1fc15d30?Expires=1740960000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=DtMfTJqnDzrjuhdsotXfrlGCgkEmRDRlgaipxuBZNLr1MZ7rF3D9372Oo3eHuXjYovZfaoBnPIQkP41yL8sN38-6biloWIMBMJaJBhwYR9RuAPqtiR~gmhSu6Cstn-a0SsuwRf0ES3C9bj09oHBdO14eklgg6LOnnlsIiT4AXDMl4pydLAVN2FKOjOM7k0kCl6bwbvRtT~pLaCmI-xFX5p6mcw4NdeYAofv4YEnkyK0v0aAGtoUemskk6s9IrVKTy2KXKlqsRGZbuenD78XAp1PNFM~0Ss7z0SSyu8znWHRGeZnVpSSYNniEj8As4vm3kgv7OPPo8Wja4SMyU~YXrA__',
+                              'https://github.com/kartikkumarofficial/TakeIt/blob/master/assets/images/auth/drone.png?raw=true',
                               fit: BoxFit.fill,
                               height: Get.height * 0.15,
                             ),
@@ -290,7 +288,7 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                     InkWell(
-                      onTap: registration, // Simplified to call registration directly
+                      onTap: registration,
                       child: Hero(
                         tag: 'Button',
                         child: Container(

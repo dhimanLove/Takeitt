@@ -111,6 +111,10 @@ dependencies:
   lucide_icons: ^0.257.0
   flutter_rating_bar: ^4.0.1
 
+  #Tabbar packages
+  bubble_tab_indicator:
+  curved_navigation_bar:
+  motion_tab_bar:
 
 dev_dependencies:
   flutter_test:

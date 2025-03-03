@@ -36,7 +36,7 @@ class _LoginState extends State<Login> {
           password: password.text,
         );
         print("user credential gathered");
-        Get.toNamed(
+        Get.offNamed(
           Routenames.gnav,
           arguments: {
             'Email': email.text,
@@ -202,7 +202,7 @@ class _LoginState extends State<Login> {
                       right: 10,
                       top: 100,
                       child: Image.network(
-                        'https://s3-alpha-sig.figma.com/img/4770/9633/14e633dcab172fa7823aa09e26b17a48?Expires=1740960000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=NqLkWw26~-sRfMvOWe6Yt6b0XGXqU-efxH1kkkjaMpsomryA4a~rXU8xU803IHQKuz5Lmgd6Fma-cPI4GjDRPgcbUVa~i~P3OOvS3filqcAPa8gcGFpcnVhoqMdOm6UZPj0QSzJuPsIeBq3bVgaZCTld-lT2VDfvd0FZv~emeuqxXjaUW5zFpbjLTHfMvYDnaHRwugzFrbSaD-qgZslp8md-1xRkdDHqTlq9twCBqqCfTJ1NRR4cGa3rGmgb~KhW49twSxc~R6StW4RTrgBAEL3fINSTtn7-J2lfyQIrfAZJ26V4TD1bs8rGlx9Pk-O2yO86vK3D~jXTXK3Mq1JaTA__',
+                        'https://github.com/kartikkumarofficial/TakeIt/blob/master/assets/images/onboardingscreen/box.png?raw=true',
                         height: Get.height * 0.15,
                       ),
                     ),

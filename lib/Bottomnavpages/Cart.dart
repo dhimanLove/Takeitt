@@ -72,10 +72,10 @@ class _CartState extends State<Cart> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Favorites (Wishlist) Section
+
                   Container(
                     width: Get.width,
-                    // Removed fixed height to allow dynamic content
+
                     color: Colors.white,
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -92,8 +92,8 @@ class _CartState extends State<Cart> {
                         const SizedBox(height: 10),
                         favoritesProducts.isNotEmpty
                             ? SizedBox(
-                          // Use SizedBox with a constrained height to prevent overflow
-                          height: Get.height * 0.45, // Adjusted height to fit within the screen
+
+                          height: Get.height * 0.45,
                           child: ListView.builder(
                             shrinkWrap: true,
                             physics: const BouncingScrollPhysics(),
@@ -110,11 +110,11 @@ class _CartState extends State<Cart> {
                                   padding: const EdgeInsets.all(12),
                                   child: Stack(
                                     children: [
-                                      // Main content (image, text, and button)
+
                                       Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          // Product Image
+
                                           ClipRRect(
                                             borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
                                             child: product['imageUrl']?.startsWith('http') ?? false
@@ -135,7 +135,7 @@ class _CartState extends State<Cart> {
                                               width: 80,
                                             ),
                                           ),
-                                          // Product Details and Button
+
                                           Expanded(
                                             child: Padding(
                                               padding: const EdgeInsets.all(8.0),
@@ -156,12 +156,12 @@ class _CartState extends State<Cart> {
                                                   const SizedBox(height: 8),
                                                   ElevatedButton(
                                                     onPressed: () {
-                                                      // Optional: Add to cart when "Shop Now" is pressed
+
                                                       final cartProduct = {
                                                         'name': product['name'],
                                                         'price': product['price'],
                                                         'imageUrl': product['imageUrl'],
-                                                        'quantity': 1, // Default quantity
+                                                        'quantity': 1,
                                                       };
                                                       addProductToCart(cartProduct);
                                                     },
@@ -183,7 +183,7 @@ class _CartState extends State<Cart> {
                                           ),
                                         ],
                                       ),
-                                      // Favorite Icon (for removal from wishlist)
+                                      
                                       Positioned(
                                         top: 8,
                                         right: 8,
@@ -213,7 +213,7 @@ class _CartState extends State<Cart> {
                     ),
                   ),
 
-                  // Cart Section (unchanged)
+
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(

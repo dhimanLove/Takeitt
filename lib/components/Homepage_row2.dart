@@ -143,7 +143,7 @@ class _HomepageRow2State extends State<HomepageRow2> {
                           child: Hero(
                             tag: 'laptop',
                             child: FadeInImage(
-                              placeholder: AssetImage('assets/placeholder.png'),
+                              placeholder: AssetImage('lib/Assets/mac.png'),
                               image: AssetImage('lib/Assets/mac.png'),
                               fadeInDuration: Duration(milliseconds: 300),
                             ),

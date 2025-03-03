@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:takeittt/components/rightangletriangle.dart';
-import 'package:takeittt/pages/Wallet.dart';
+import 'package:takeittt/components/Wallet.dart';
 
 class HomeTopContainer extends StatefulWidget {
   const HomeTopContainer({Key? key}) : super(key: key);

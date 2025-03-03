@@ -666,28 +666,29 @@ class _CategoriesState extends State<Categories> {
               final item = items[selectedCategory]![index];
               return Column(children: [
                 Expanded(
-                    child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: CachedNetworkImage(
-                    imageUrl: item['image']!,
-                    width: Get.width * 0.25,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Shimmer.fromColors(
-                      direction: ShimmerDirection.ltr,
-                      baseColor: Colors.grey[400]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(color: Colors.grey),
-                    ),
-                    errorWidget: (context, url, error) => Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: CachedNetworkImage(
+                        imageUrl: item['image']!,
                         width: Get.width * 0.25,
-                        height: Get.width * 0.25, // Same size as image
-                        color: Colors.grey,
-                      ),
-                    ),
-                )),
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          direction: ShimmerDirection.ltr,
+                          baseColor: Colors.grey[400]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(color: Colors.grey),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: Get.width * 0.25,
+                            height: Get.width * 0.25,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )),
                 ),
                 SizedBox(height: 4),
                 Text(

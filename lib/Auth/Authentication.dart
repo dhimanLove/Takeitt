@@ -2,12 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../routes/routenames.dart';
 
 class GoogleSignInProvider {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  /// Sign in with Google
+
   Future<UserCredential?> signInWithGoogle() async {
     try {
       print("Attempting Google sign-in...");
@@ -28,7 +31,7 @@ class GoogleSignInProvider {
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       print("Google sign-in successful: ${userCredential.user?.email}");
 
-      // Add or update user in Firestore
+
       await _saveUserToFirestore(userCredential.user);
 
       return userCredential;
@@ -100,7 +103,7 @@ Future<void> signUpWithGoogle(BuildContext context) async {
       });
 
       print("New user registered successfully! Navigating to Home...");
-      Navigator.pushReplacementNamed(context, '/home');
+     Get.toNamed(Routenames.home);
     }
   } catch (error) {
     print("Google Sign-Up Error: $error");

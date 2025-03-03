@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: Getstarted(),
       getPages: Routes.pages,
-      initialRoute:  Routenames.getstart,
+      initialRoute:FirebaseAuth.instance.currentUser != null ?Routenames.getstart:Routenames.home,
     );
   }
 }

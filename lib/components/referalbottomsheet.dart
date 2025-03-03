@@ -20,7 +20,6 @@ void showReferralBottomSheet(BuildContext context) {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 15),
-
           GridView.count(
             shrinkWrap: true,
             crossAxisCount: 3, // 3 items per row
@@ -40,10 +39,13 @@ void showReferralBottomSheet(BuildContext context) {
                     CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.green.shade50,
-                      child: Icon(FontAwesomeIcons.whatsapp, size: 30, color: Colors.green),
+                      child: Icon(FontAwesomeIcons.whatsapp,
+                          size: 30, color: Colors.green),
                     ),
                     SizedBox(height: 5),
-                    Text("WhatsApp", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("WhatsApp",
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -59,10 +61,13 @@ void showReferralBottomSheet(BuildContext context) {
                     CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.pink.shade50,
-                      child: Icon(FontAwesomeIcons.instagram, size: 30, color: Colors.pink),
+                      child: Icon(FontAwesomeIcons.instagram,
+                          size: 30, color: Colors.pink),
                     ),
                     SizedBox(height: 5),
-                    Text("Instagram", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("Instagram",
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -78,10 +83,13 @@ void showReferralBottomSheet(BuildContext context) {
                     CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.blue.shade50,
-                      child: Icon(FontAwesomeIcons.facebook, size: 30, color: Colors.blue),
+                      child: Icon(FontAwesomeIcons.facebook,
+                          size: 30, color: Colors.blue),
                     ),
                     SizedBox(height: 5),
-                    Text("Facebook", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("Facebook",
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -97,17 +105,21 @@ void showReferralBottomSheet(BuildContext context) {
                     CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.blue.shade50,
-                      child: Icon(FontAwesomeIcons.telegram, size: 30, color: Colors.blue),
+                      child: Icon(FontAwesomeIcons.telegram,
+                          size: 30, color: Colors.blue),
                     ),
                     SizedBox(height: 5),
-                    Text("Telegram", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("Telegram",
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
               GestureDetector(
                 onTap: () {
-                  String subject = Uri.encodeComponent("Join me on EcoTrack!");
-                  String body = Uri.encodeComponent("Use my referral code: ECO1234 to sign up.");
+                  String subject = Uri.encodeComponent("Join me on Take-it");
+                  String body = Uri.encodeComponent(
+                      "Use my referral code: ECO1234 to sign up.");
                   String emailUrl = "mailto:?subject=$subject&body=$body";
                   launchUrl(Uri.parse(emailUrl));
                   Get.back();
@@ -121,7 +133,9 @@ void showReferralBottomSheet(BuildContext context) {
                       child: Icon(Icons.email, size: 30, color: Colors.red),
                     ),
                     SizedBox(height: 5),
-                    Text("Email", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("Email",
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -141,7 +155,9 @@ void showReferralBottomSheet(BuildContext context) {
                       child: Icon(Icons.copy, size: 30, color: Colors.grey),
                     ),
                     SizedBox(height: 5),
-                    Text("Copy Code", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("Copy Code",
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
